@@ -1,7 +1,7 @@
 <div class="login-banner d-none d-md-block border-top">
   <div class="container p-3">
     <div class="d-flex justify-content-center align-items-center">
-      <p class="login-banner-text mr-5">Search, Apply & Get Job <strong>Free</strong></p>
+      <p class="login-banner-text mr-5"> <strong>Free</strong></p>
       <a href="{{route('register')}}" class="primary-btn mr-4">Register</a>
       <a href="{{route('login')}}" class="primary-outline-btn mr-4">Login</a>
       <a href="{{route('login')}}" class="secondary-link">Are you an Employer?</a>

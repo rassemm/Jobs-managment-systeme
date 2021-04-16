@@ -19,6 +19,7 @@ class CreateJobsTable extends Migration
             $table->string('description');
             $table->string('salaire');
             $table->date('end_date');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }

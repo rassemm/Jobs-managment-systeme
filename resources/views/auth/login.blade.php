@@ -6,8 +6,7 @@
         <div class="col-sm-12 col-md-6 px-0">
             <div class="login-container">
                 <div class="login-header mb-3">
-                    <h3> <img src="{{asset('images/logo/joblister.png')}}" width="50px;" alt=""> Joblister Login</h3>
-                    <p class="login-header-title">Welcome back to Job lister</p>
+                    <h3> <img src="{{asset('images/logo/joblister.png')}}" width="50px;" alt=""> Jobs Mnagament System Login</h3>
                     <p class="text-muted">login with your registered email & password.</p>
                 </div>
                 <div class="login-form">
@@ -82,7 +81,7 @@
     height: 100%;
     display: inline-block;
     float: right;
-    border-radius: 10%;
+    
 }
 </style>
 @endpush

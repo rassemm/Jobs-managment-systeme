@@ -39,6 +39,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
  
+    public function jobs(){
+        return $this->belongsToMany(Job::class);
+      }
+      public function isSubscribedJob($id){
+        return null !== $this->jobs()->where('Job_id', $id)->first();
+      }
+      public function posts(){
+        return $this->belongsToMany(Post::class);
+      }
+      public function isSubscribedPost($id){
+        return null !== $this->posts()->where('post_id', $id)->first();
+      }
     // public function authorizeRoles($roles){
     //     if (is_array($roles)) {
     //         return $this->hasAnyRole($roles) ||

@@ -8,6 +8,7 @@
   font-size: 18px;
 }
 </style>
+<div class="col-lg-3 col-6">
 <div class="small-box bg-danger">
   <div class="inner">
     <h3>{{$posts->count()}}</h3>
@@ -19,13 +20,14 @@
   </div>
   <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
 </div>
+</div>
 <div class="container">
     <div class="row">
         <div class="topright">
-            <a class="btn btn-success mb-5" href="{{ route('post.create') }}"> Create New Product</a>
+            <a class="btn btn-success mb-5" href="{{ route('post.create') }}"> <i class="fa fa-plus"></i></a>
         </div>
  
-    <table class="table table-bordered">
+    <table class="table table-responsive-sm table-striped">
         <tr>
             <th>ID</th>
             <th>Title</th>
@@ -46,13 +48,13 @@
             <td>
                 <form action="{{ route('post.destroy',$post->id) }}" method="POST">
    
-                <a class="btn btn-info" href="{{ route('post.show',$post->id)}}">Show</a>
+                <a class="btn btn-info" href="{{ route('post.show',$post->id)}}"><i class="fa fa-list"></i></a>
     
-                <a class="btn btn-primary" href="{{ route('post.edit',$post->id)}}">Edit</a>
+                <a class="btn btn-primary" href="{{ route('post.edit',$post->id)}}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                  @csrf
                   @method('delete')
                     
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                 </form>
             </td>
         </tr>

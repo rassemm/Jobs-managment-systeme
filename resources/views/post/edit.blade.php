@@ -45,7 +45,7 @@
     
     <div class="form-group">
         <strong>description</strong>
-    <textarea name="description" class="form-control"  cols="30" rows="10"> {{$post->description}}</textarea>
+    <textarea name="description" class="form-control"  cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"> {{$post->description}}</textarea>
     </div>
     
     <div class="col-xs-12 col-sm-12 col-md-12 text-center">
@@ -53,5 +53,59 @@
 </div>
     </form>   
 </div>
+<div class="col-md-12 col-lg-12">
+    <div class="card">
+                    <div class="card-header">
+                      <i class="fa fa-align-justify"></i>{{ __('Subscribed Users') }}
+                     
+                    <div class="card-body">
+                        <table class="table table-responsive-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>E-mail</th>
+                            <th>Status</th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach($users as $key => $user)
+                            <tr>
+                              <th>{{ ++$key }}</th>
+                              <td><b>{{ $user->name }}</b></td>
+                              <td>{{ $user->email }}</td>
+                              <td>{{ $user->status }}</td>
+                              <td>
+                                @if($user->status != 'approved')
+                                  <form method="POST" action="{{route('approvepost',[$user->id,$post->id])}}">
+                                      @csrf
+                                      @method('PUT')
+                                      <button class="btn btn-success"  type="submit">Accepter</button>
+                                  </form>
+                                @else
+                                  <form method="POST" action="{{route('unapprovepost',[$user->id,$post->id])}}">
+                                      @csrf
+                                      @method('PUT')
+                                      <button class="btn btn-danger"  type="submit">Annuler</button>
+                                  </form>
+                                @endif
+                                </td>
+                                <td>
+                                @if($user->status == 'pending')
 
+                                <form method="POST" action="">
+                                    @csrf
+                                    @method('PUT')
+                                    <button class="btn btn-danger"  type="submit">Remove</button>
+                                </form>
+                                @endif
+                              </td>
+                            </tr>
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
 @endsection

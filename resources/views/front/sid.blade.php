@@ -66,8 +66,20 @@
               </a>
             </li>
             @endif
-            
-            
+            @if (auth()->user()->hasRole('user'))
+            <li class="nav-item">
+              <a href="{{route('myjobs')}}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Mes demandes D'emplois</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{route('myposts')}}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Mes demandes de stages</p>
+              </a>
+            </li>
+            @endif
           </ul>
         </li>
      

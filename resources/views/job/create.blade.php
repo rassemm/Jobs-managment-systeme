@@ -44,7 +44,7 @@
     
     <div class="form-group">
         <strong>description</strong>
-          <textarea name="description" class="form-control" cols="30" rows="10"></textarea>
+          <textarea name="description" class="form-control" cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"></textarea>
     </div>
     
     <div class="col-xs-12 col-sm-12 col-md-12 text-center">

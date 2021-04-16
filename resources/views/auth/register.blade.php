@@ -112,7 +112,7 @@
     background-size: cover;
     background-position: center;
     height: 100%;
-    padding-right: 100px;
+  
     
 }
 </style>

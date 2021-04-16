@@ -20,6 +20,7 @@ class CreatePostsTable extends Migration
             $table->string('niveau');
             $table->date('end_date');
             $table->date('start_date');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }

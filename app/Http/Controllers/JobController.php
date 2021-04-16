@@ -1,12 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\DB;
+use App\user;
 use App\Job;
+use App\Categories;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
+
+  public function __construct()
+  {
+      $this->middleware('auth');
+  }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +21,8 @@ class JobController extends Controller
      */
     public function index()
     {
-        $jobs = job::latest()->paginate(5);
+      
+        $jobs = job::with('user')->latest()->paginate(5);
         toastr()->success('Data has been saved successfully!');
         return view('job.index',compact('jobs'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
@@ -27,7 +35,8 @@ class JobController extends Controller
      */
     public function create()
     {
-        return view ('job.create');
+      $categories = Categories::all();
+        return view ('job.create',compact('categories'));
     }
 
     /**
@@ -38,17 +47,26 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-      //  if ($request->user()->can('create-job')) { }
+     // if ($request->user()->can('create-job')) { }
             $request->validate ([
                 'titre'=>'required',
-               'description'=>'required',
-              'salaire'=>'required',
-                     'end_date'=> 'required'
+                'description'=>'required',
+                'salaire'=>'required',
+                'end_date'=> 'required'
                 ]);
-                Job::create($request->all());
-                toastr()->success('Data has been saved successfully!');
-    
-                return redirect()->route('job.index');
+                $user = auth()->user();
+                $job = new Job();
+                $job->titre= $request->input('titre');
+                $job->description   = $request->input('description');
+                $job->salaire = $request->input('salaire');
+                $job->end_date = $request->input('end_date');
+                $job->user_id = $user->id;
+                
+                $job->save();
+                $job->user_id = $user->id;
+              
+              notify()->success('Data has been saved successfully!');
+                              return redirect()->route('job.index');
                    
         
     }
@@ -61,6 +79,14 @@ class JobController extends Controller
      */
     public function show(Job $job)
     {
+      //  $job = Job::with('user')->find($id);
+        // $users = User::whereHas('events', function($q) use($event){
+        //   $q->whereIn('event_id', [$event->id]);
+        // })->get()->map(function ($item, $key) use($id){
+        //   $item->status = DB::select('select * from event_user where event_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;
+        //   return $item;
+        // });
+        
         return view('job.show',compact('job'));
     }
 
@@ -70,9 +96,16 @@ class JobController extends Controller
      * @param  \App\Job  $job
      * @return \Illuminate\Http\Response
      */
-    public function edit(Job $job)
+    public function edit($id)
     {
-        return view('job.edit',compact('job'));
+        $job = Job::find($id);
+        $users = User::whereHas('jobs', function($q) use($job){
+          $q->whereIn('job_id', [$job->id]);
+        })->get()->map(function ($item, $key) use($id){
+          $item->status = DB::select('select * from job_user where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;
+          return $item;
+        });
+        return view('job.edit',compact('job','users'));
 
     }
 
@@ -83,7 +116,7 @@ class JobController extends Controller
      * @param  \App\Job  $job
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Job $job)
+    public function update(Request $request,$id)
     {
         $request->validate ([
             'titre'=>'required',
@@ -91,9 +124,18 @@ class JobController extends Controller
           'salaire'=>'required',
                  'end_date'=> 'required'
             ]);
-            toastr()->success('Data has been saved successfully!');
+            $user = auth()->user();
+               $job =Job::find($id);
+               $job->titre     = $request->input('titre');
+               $job->description   = $request->input('description');
+               $job->salaire = $request->input('salaire');
+               $job->end_date = $request->input('end_date');
+               $job->user_id = $user->id;
+               $job->save();
+                $job->user_id = $user->id;
+                notify()->info('Data has been Update successfully!');
 
-            $job->update($request->all());
+            //$job->update($request->all());
             return redirect()->route('job.index');
     }
 
@@ -105,9 +147,42 @@ class JobController extends Controller
      */
     public function destroy(Job $job)
     {
-        $job->delete();
-        toastr()->success('Data has been saved successfully!');
+        $job = Job::find($id);
+        if($job){
+            $job->delete();
+        }
+        notify()->danger('Data has been saved successfully!');
 
         return redirect()->route('job.index');
+    }
+    public function subscribe($id){
+        auth()->user()->jobs()->attach($id);
+        drakify('success');
+        notify()->success('Data has been subscribe successfully!');
+        return redirect()->back();
+      }
+      public function remove($id,$uid){
+        User::find($uid)->jobs()->detach($id);
+        drakify('success');
+        return redirect()->route('dachboard.dash');
+      }
+      public function approve($uid,$id){
+       
+        DB::update('update job_user set status = "approved" where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);
+        //notify()->succes('User has approve successfully!');
+
+        return redirect()->back();      }
+      public function unapprove($uid,$id){
+        DB::update('update job_user set status = "unapproved" where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);
+        return redirect()->back();
+      }
+      public function myJobs(){
+        $jobs= Job::whereHas('user', function($q){
+          $q->whereIn('user_id', [auth()->user()->id]);
+        })->get()->map(function ($item, $key){
+          $item->status = DB::select('select * from job_user where job_id = :id and user_id= :uid', ['id' => $item->id,'uid' => auth()->user()->id])[0]->status;
+          return $item;
+        });
+        return view('job.list', ['jobs' => $jobs]);
     }
 }

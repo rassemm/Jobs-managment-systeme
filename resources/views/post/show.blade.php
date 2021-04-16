@@ -1,41 +1,42 @@
 @extends('layouts.master')
 
 @section('content')
-    <div class="row">
-        <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
-                <h2> Show Post</h2>
-            </div>
-            <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('post.index') }}"> Back</a>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+              <div class="card-header">
+                <i class="fa fa-align-justify"></i>Post: {{ $post->titre }}
+              </div>
+           
+       
+    <div class="card-body">
    
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>Titre:</strong>
-                {{ $post->titre }}
+             <h4>  Titre: {{ $post->titre }}</h4>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Description:</strong>
-                {{ $post->description}}
+             <p>{{ $post->description}}</p>   
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>Date de debut:</strong>
-                {{ $post->start_date}}
+                <h4 class="badge badge-success">Date de debut:
+                {{ $post->start_date}} </h4>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>Date de fin:</strong>
-                {{ $post->end_date}}
+                <h4 class="badge badge-danger">Date de fin:
+                {{ $post->end_date}} </h4>
             </div>
         </div>
     </div>
+</div>
 @endsection
