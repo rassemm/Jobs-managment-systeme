@@ -30,6 +30,7 @@ class FrontController extends Controller
         ])
         ->orderBy("id","desc")
         ->paginate(2);
+        
         notify()->success('Data has been saved successfully!');
             //$jobs = Job::with('user')->latest()->paginate(5);
             $jobs= Job::with('user')->where ([
@@ -42,11 +43,12 @@ class FrontController extends Controller
             ])
             ->orderBy("id","desc")
             ->paginate(2);
+            
             notify()->success('Data has been saved successfully!');
             
         $users = User::all();
         return view('dachboard.dach',compact('posts','jobs','users'))->with('i', (request()->input('page', 1) - 1) * 5);
-        ;
+        
     }
    
 

@@ -36,7 +36,7 @@
             <li class="nav-item">
               <a href="{{route('permission.index')}}" class="nav-link active">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Managment Permission</p>
+                <p>{{ __('Managment Permission')}}</p>
               </a>
             </li>
             <li class="nav-item">

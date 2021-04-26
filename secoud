@@ -1,0 +1,1379 @@
+warning: LF will be replaced by CRLF in app/Http/Controllers/Auth/LoginController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Http/Controllers/FrontController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Http/Controllers/HomeController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Http/Controllers/JobController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Http/Controllers/PostController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Http/Controllers/UserController.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Job.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/Post.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in app/User.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in composer.json.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in composer.lock.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in config/app.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in database/migrations/2021_02_25_144316_create_jobs_table.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in database/migrations/2021_02_25_190949_create_posts_table.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in resources/views/auth/login.blade.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in resources/views/auth/register.blade.php.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in routes/web.php.
+The file will have its original line endings in your working directory
+[1mdiff --git a/app/Http/Controllers/Auth/LoginController.php b/app/Http/Controllers/Auth/LoginController.php[m
+[1mindex d30a94e..5bec4a6 100644[m
+[1m--- a/app/Http/Controllers/Auth/LoginController.php[m
+[1m+++ b/app/Http/Controllers/Auth/LoginController.php[m
+[36m@@ -54,7 +54,7 @@[m [mclass LoginController extends Controller[m
+ [m
+         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'))) {[m
+ [m
+[31m-            return view('admins.index');[m
+[32m+[m[32m            return view('');[m
+         }[m
+         return back()->withInput($request->only('email', 'remember'));[m
+     }[m
+[1mdiff --git a/app/Http/Controllers/FrontController.php b/app/Http/Controllers/FrontController.php[m
+[1mindex 515e742..98151cf 100644[m
+[1m--- a/app/Http/Controllers/FrontController.php[m
+[1m+++ b/app/Http/Controllers/FrontController.php[m
+[36m@@ -15,10 +15,14 @@[m [mclass FrontController extends Controller[m
+      */[m
+     public function index()[m
+     {[m
+[31m-        $posts = Post::all();[m
+[31m-        $jobs = Job::all();[m
+[32m+[m[32m        $posts = Post::with('user')->latest()->paginate(5);[m
+[32m+[m[32m        notify()->success('Data has been saved successfully!');[m
+[32m+[m[32m            $jobs = Job::with('user')->latest()->paginate(5);[m
+[32m+[m[32m            notify()->success('Data has been saved successfully!');[m
+[32m+[m[41m            [m
+         $users = User::all();[m
+[31m-        return view('dachboard.dach',compact('posts','jobs','users'));[m
+[32m+[m[32m        return view('dachboard.dach',compact('posts','jobs','users'))->with('i', (request()->input('page', 1) - 1) * 5);[m
+[32m+[m[32m        ;[m
+     }[m
+ [m
+     /**[m
+[1mdiff --git a/app/Http/Controllers/HomeController.php b/app/Http/Controllers/HomeController.php[m
+[1mindex 5c6f540..39bf099 100644[m
+[1m--- a/app/Http/Controllers/HomeController.php[m
+[1m+++ b/app/Http/Controllers/HomeController.php[m
+[36m@@ -23,6 +23,6 @@[m [mclass HomeController extends Controller[m
+      */[m
+     public function index()[m
+     {[m
+[31m-     [m
+[32m+[m[32m     return view ('dachboard.dach');[m
+     }[m
+ }[m
+[1mdiff --git a/app/Http/Controllers/JobController.php b/app/Http/Controllers/JobController.php[m
+[1mindex 8197503..29cb159 100644[m
+[1m--- a/app/Http/Controllers/JobController.php[m
+[1m+++ b/app/Http/Controllers/JobController.php[m
+[36m@@ -1,7 +1,8 @@[m
+ <?php[m
+ [m
+ namespace App\Http\Controllers;[m
+[31m-[m
+[32m+[m[32muse Illuminate\Support\Facades\DB;[m
+[32m+[m[32muse App\user;[m
+ use App\Job;[m
+ use Illuminate\Http\Request;[m
+ [m
+[36m@@ -14,7 +15,7 @@[m [mclass JobController extends Controller[m
+      */[m
+     public function index()[m
+     {[m
+[31m-        $jobs = job::latest()->paginate(5);[m
+[32m+[m[32m        $jobs = job::with('user')->latest()->paginate(5);[m
+         toastr()->success('Data has been saved successfully!');[m
+         return view('job.index',compact('jobs'))[m
+             ->with('i', (request()->input('page', 1) - 1) * 5);[m
+[36m@@ -41,14 +42,22 @@[m [mclass JobController extends Controller[m
+       //  if ($request->user()->can('create-job')) { }[m
+             $request->validate ([[m
+                 'titre'=>'required',[m
+[31m-               'description'=>'required',[m
+[31m-              'salaire'=>'required',[m
+[31m-                     'end_date'=> 'required'[m
+[32m+[m[32m                'description'=>'required',[m
+[32m+[m[32m                'salaire'=>'required',[m
+[32m+[m[32m                'end_date'=> 'required'[m
+                 ]);[m
+[31m-                Job::create($request->all());[m
+[31m-                toastr()->success('Data has been saved successfully!');[m
+[31m-    [m
+[31m-                return redirect()->route('job.index');[m
+[32m+[m[32m                $user = auth()->user();[m
+[32m+[m[32m                $job = new Job();[m
+[32m+[m[32m                $job->titre     = $request->input('titre');[m
+[32m+[m[32m                $job->description   = $request->input('description');[m
+[32m+[m[32m                $job->salaire = $request->input('salaire');[m
+[32m+[m[32m                $job->end_date = $request->input('end_date');[m
+[32m+[m[32m                $job->user_id = $user->id;[m
+[32m+[m[32m                $job->save();[m
+[32m+[m[32m                $job->user_id = $user->id;[m
+[32m+[m[41m              [m
+[32m+[m[32m              notify()->success('Data has been saved successfully!');[m
+[32m+[m[32m                              return redirect()->route('job.index');[m
+                    [m
+         [m
+     }[m
+[36m@@ -61,7 +70,14 @@[m [mclass JobController extends Controller[m
+      */[m
+     public function show(Job $job)[m
+     {[m
+[31m-        return view('job.show',compact('job'));[m
+[32m+[m[32m        $job = Job::with('user')->find($id);[m
+[32m+[m[32m        // $users = User::whereHas('events', function($q) use($event){[m
+[32m+[m[32m        //   $q->whereIn('event_id', [$event->id]);[m
+[32m+[m[32m        // })->get()->map(function ($item, $key) use($id){[m
+[32m+[m[32m        //   $item->status = DB::select('select * from event_user where event_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;[m
+[32m+[m[32m        //   return $item;[m
+[32m+[m[32m        // });[m
+[32m+[m[32m        return view('job.show',compact('job','users'));[m
+     }[m
+ [m
+     /**[m
+[36m@@ -70,9 +86,16 @@[m [mclass JobController extends Controller[m
+      * @param  \App\Job  $job[m
+      * @return \Illuminate\Http\Response[m
+      */[m
+[31m-    public function edit(Job $job)[m
+[32m+[m[32m    public function edit($id)[m
+     {[m
+[31m-        return view('job.edit',compact('job'));[m
+[32m+[m[32m        $job = Job::find($id);[m
+[32m+[m[32m        $users = User::whereHas('jobs', function($q) use($job){[m
+[32m+[m[32m          $q->whereIn('job_id', [$job->id]);[m
+[32m+[m[32m        })->get()->map(function ($item, $key) use($id){[m
+[32m+[m[32m          $item->status = DB::select('select * from job_user where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;[m
+[32m+[m[32m          return $item;[m
+[32m+[m[32m        });[m
+[32m+[m[32m        return view('job.edit',compact('job','users'));[m
+ [m
+     }[m
+ [m
+[36m@@ -83,7 +106,7 @@[m [mclass JobController extends Controller[m
+      * @param  \App\Job  $job[m
+      * @return \Illuminate\Http\Response[m
+      */[m
+[31m-    public function update(Request $request, Job $job)[m
+[32m+[m[32m    public function update(Request $request,$id)[m
+     {[m
+         $request->validate ([[m
+             'titre'=>'required',[m
+[36m@@ -91,9 +114,18 @@[m [mclass JobController extends Controller[m
+           'salaire'=>'required',[m
+                  'end_date'=> 'required'[m
+             ]);[m
+[31m-            toastr()->success('Data has been saved successfully!');[m
+[32m+[m[32m            $user = auth()->user();[m
+[32m+[m[32m               $job =Job::find($id);[m
+[32m+[m[32m               $job->titre     = $request->input('titre');[m
+[32m+[m[32m               $job->description   = $request->input('description');[m
+[32m+[m[32m               $job->salaire = $request->input('salaire');[m
+[32m+[m[32m               $job->end_date = $request->input('end_date');[m
+[32m+[m[32m               $job->user_id = $user->id;[m
+[32m+[m[32m               $job->save();[m
+[32m+[m[32m                $job->user_id = $user->id;[m
+[32m+[m[32m                notify()->info('Data has been Update successfully!');[m
+ [m
+[31m-            $job->update($request->all());[m
+[32m+[m[32m            //$job->update($request->all());[m
+             return redirect()->route('job.index');[m
+     }[m
+ [m
+[36m@@ -105,9 +137,33 @@[m [mclass JobController extends Controller[m
+      */[m
+     public function destroy(Job $job)[m
+     {[m
+[31m-        $job->delete();[m
+[31m-        toastr()->success('Data has been saved successfully!');[m
+[32m+[m[32m        $job = Job::find($id);[m
+[32m+[m[32m        if($job){[m
+[32m+[m[32m            $job->delete();[m
+[32m+[m[32m        }[m
+[32m+[m[32m        notify()->danger('Data has been saved successfully!');[m
+ [m
+         return redirect()->route('job.index');[m
+     }[m
+[32m+[m[32m    public function subscribe($id){[m
+[32m+[m[32m        auth()->user()->jobs()->attach($id);[m
+[32m+[m[32m        drakify('success');[m
+[32m+[m[32m        notify()->success('Data has been subscribe successfully!');[m
+[32m+[m[32m        return redirect()->back();[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function remove($id,$uid){[m
+[32m+[m[32m        User::find($uid)->jobs()->detach($id);[m
+[32m+[m[32m        drakify('success');[m
+[32m+[m[32m        return redirect()->route('dachboard.dash');[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function approve($uid,$id){[m
+[32m+[m[41m       [m
+[32m+[m[32m        DB::update('update job_user set status = "approved" where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);[m
+[32m+[m[32m        //notify()->succes('User has approve successfully!');[m
+[32m+[m
+[32m+[m[32m        return redirect()->back();      }[m
+[32m+[m[32m      public function unapprove($uid,$id){[m
+[32m+[m[32m        DB::update('update job_user set status = "unapproved" where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);[m
+[32m+[m[32m        return redirect()->back();[m
+[32m+[m[32m      }[m
+ }[m
+[1mdiff --git a/app/Http/Controllers/PostController.php b/app/Http/Controllers/PostController.php[m
+[1mindex 27a92bb..4814210 100644[m
+[1m--- a/app/Http/Controllers/PostController.php[m
+[1m+++ b/app/Http/Controllers/PostController.php[m
+[36m@@ -13,8 +13,8 @@[m [mclass PostController extends Controller[m
+      */[m
+     public function index()[m
+     {[m
+[31m-        $posts = Post::latest()->paginate(5);[m
+[31m-        toastr()->success('Data has been saved successfully!');[m
+[32m+[m[32m        $posts = Post::with('user')->latest()->paginate(5);[m
+[32m+[m[32m        notify()->success('Data has been saved successfully!');[m
+         return view('Post.index',compact('posts'))[m
+             ->with('i', (request()->input('page', 1) - 1) * 5);[m
+     }[m
+[36m@@ -44,7 +44,17 @@[m [mclass PostController extends Controller[m
+           'start_date'=> 'required',[m
+                  'end_date'=> 'required'[m
+             ]);[m
+[31m-            Post::create($request->all());[m
+[32m+[m[32m            $user = auth()->user();[m
+[32m+[m[32m                $post = new Post();[m
+[32m+[m[32m                $post->titre     = $request->input('titre');[m
+[32m+[m[32m                $post->description   = $request->input('description');[m
+[32m+[m[32m                $post->niveau = $request->input('niveau');[m
+[32m+[m[32m                $post->start_date = $request->input('start_date');[m
+[32m+[m[32m                $post->end_date = $request->input('end_date');[m
+[32m+[m[32m                $post->user_id = $user->id;[m
+[32m+[m[32m                $post->save();[m
+[32m+[m[32m                $post->user_id = $user->id;[m
+[32m+[m[32m           // Post::create($request->all());[m
+             toastr()->success('Data has been saved successfully!');[m
+ [m
+             return redirect()->route('post.index');[m
+[36m@@ -58,7 +68,9 @@[m [mclass PostController extends Controller[m
+      */[m
+     public function show( Post $post)[m
+     {[m
+[31m-        return view ('post.show',compact('post'));[m
+[32m+[m[32m        $post= Post::with('user')->find($id);[m
+[32m+[m
+[32m+[m[32m        return view ('post.show',compact('post','users'));[m
+     }[m
+ [m
+     /**[m
+[36m@@ -67,9 +79,16 @@[m [mclass PostController extends Controller[m
+      * @param  int  $id[m
+      * @return \Illuminate\Http\Response[m
+      */[m
+[31m-    public function edit( Post $post)[m
+[32m+[m[32m    public function edit($id)[m
+     {[m
+[31m-        return view ('post.edit',compact('post'));[m
+[32m+[m[32m        $post = Post::find($id);[m
+[32m+[m[32m        $users = User::whereHas('posts', function($q) use($post){[m
+[32m+[m[32m          $q->whereIn('post_id', [$post->id]);[m
+[32m+[m[32m        })->get()->map(function ($item, $key) use($id){[m
+[32m+[m[32m          $item->status = DB::select('select * from post_user where post_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;[m
+[32m+[m[32m          return $item;[m
+[32m+[m[32m        });[m
+[32m+[m[32m        return view ('post.edit',compact('post','users'));[m
+ [m
+     }[m
+ [m
+[36m@@ -83,14 +102,22 @@[m [mclass PostController extends Controller[m
+     public function update(Request $request, Post $post)[m
+     {[m
+         $request->validate ([[m
+[31m-            'titre'=>'required',[m
+[31m-           'description'=>'required',[m
+[31m-          'niveau'=>'required',[m
+[31m-          'start_date'=> 'required',[m
+[31m-                 'end_date'=> 'required'[m
+[32m+[m[32m              'titre'  =>  'required',[m
+[32m+[m[32m              'description' => 'required',[m
+[32m+[m[32m             'niveau' => 'required',[m
+[32m+[m[32m             'start_date'  => 'required',[m
+[32m+[m[32m             'end_date'=> 'required'[m
+             ]);[m
+[31m-            $post->update($request->all());[m
+[31m-            toastr()->success('Data has been saved successfully!');[m
+[32m+[m[32m            $user = auth()->user();[m
+[32m+[m[32m                $post = new Post();[m
+[32m+[m[32m                $post->titre     = $request->input('titre');[m
+[32m+[m[32m                $post->description   = $request->input('description');[m
+[32m+[m[32m                $post->niveau = $request->input('niveau');[m
+[32m+[m[32m                $post->start_date = $request->input('start_date');[m
+[32m+[m[32m                $post->end_date = $request->input('end_date');[m
+[32m+[m[32m                $post->user_id = $user->id;[m
+[32m+[m[32m                $post->save();[m
+[32m+[m[32m                $post->user_id = $user->id;[m
+ [m
+             return redirect()->route('post.index');[m
+     [m
+[36m@@ -104,9 +131,34 @@[m [mclass PostController extends Controller[m
+      */[m
+     public function destroy($id)[m
+     {[m
+[31m-        $post->delete();[m
+[31m-        toastr()->success('Data has been saved successfully!');[m
+[32m+[m[32m        $post = Post::find($id);[m
+[32m+[m[32m        if($post){[m
+[32m+[m[32m            $post->delete();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m       // notify()->danger('Data has been saved successfully!');[m
+ [m
+         return redirect()->route('post.index');[m
+     }[m
+[32m+[m[32m    public function subscribe($id){[m
+[32m+[m[32m        auth()->user()->posts()->attach($id);[m
+[32m+[m[32m        drakify('success');[m
+[32m+[m[32m        //notify()->success('Data has been subscribe successfully!');[m
+[32m+[m[32m        return redirect()->back();[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function remove($id,$uid){[m
+[32m+[m[32m        User::find($uid)->posts()->detach($id);[m
+[32m+[m[32m        drakify('success');[m
+[32m+[m[32m        return redirect()->route('dachboard.dash');[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function approve($uid,$id){[m
+[32m+[m[41m       [m
+[32m+[m[32m        DB::update('update post_user set status = "approved" where post_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);[m
+[32m+[m[32m        notify()->succes('User has approve successfully!');[m
+[32m+[m
+[32m+[m[32m        return redirect()->back();      }[m
+[32m+[m[32m      public function unapprove($uid,$id){[m
+[32m+[m[32m        DB::update('update post_user set status = "unapproved" where post_id = :id and user_id= :uid', ['id' => $id,'uid' => $uid]);[m
+[32m+[m[32m        return redirect()->back();[m
+[32m+[m[32m      }[m
+ }[m
+[1mdiff --git a/app/Http/Controllers/UserController.php b/app/Http/Controllers/UserController.php[m
+[1mindex de7b5a3..9e2ba03 100644[m
+[1m--- a/app/Http/Controllers/UserController.php[m
+[1m+++ b/app/Http/Controllers/UserController.php[m
+[36m@@ -113,6 +113,6 @@[m [mclass UserController extends Controller[m
+     public function logout()[m
+     {[m
+         Auth::logout();[m
+[31m-        return redirect()->route('login');[m
+[32m+[m[32m        return redirect()->route('/login');[m
+     }[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/app/Job.php b/app/Job.php[m
+[1mindex a5a03b7..29cf273 100644[m
+[1m--- a/app/Job.php[m
+[1m+++ b/app/Job.php[m
+[36m@@ -7,4 +7,9 @@[m [muse Illuminate\Database\Eloquent\Model;[m
+ class Job extends Model[m
+ {[m
+     protected $fillable =['titre','description','salaire','end_date'];[m
+[32m+[m
+[32m+[m[32m    public function user(){[m
+[32m+[m[32m        return $this->belongsToMany(User::class);[m
+[32m+[m[32m    }[m
+ }[m
+[41m+[m
+[1mdiff --git a/app/Post.php b/app/Post.php[m
+[1mindex f0b741f..22294af 100644[m
+[1m--- a/app/Post.php[m
+[1m+++ b/app/Post.php[m
+[36m@@ -7,4 +7,7 @@[m [muse Illuminate\Database\Eloquent\Model;[m
+ class Post extends Model[m
+ {[m
+     protected $fillable =['titre','description','niveau','start_date','end_date'];[m
+[32m+[m[32m    public function user(){[m
+[32m+[m[32m        return $this->belongsToMany(User::class);[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/app/User.php b/app/User.php[m
+[1mindex 2bfac49..7af7f5f 100644[m
+[1m--- a/app/User.php[m
+[1m+++ b/app/User.php[m
+[36m@@ -39,6 +39,18 @@[m [mclass User extends Authenticatable[m
+         'email_verified_at' => 'datetime',[m
+     ];[m
+  [m
+[32m+[m[32m    public function jobs(){[m
+[32m+[m[32m        return $this->belongsToMany(Job::class);[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function isSubscribedJob($id){[m
+[32m+[m[32m        return null !== $this->jobs()->where('Job_id', $id)->first();[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function posts(){[m
+[32m+[m[32m        return $this->belongsToMany(Post::class);[m
+[32m+[m[32m      }[m
+[32m+[m[32m      public function isSubscribedPost($id){[m
+[32m+[m[32m        return null !== $this->posts()->where('post_id', $id)->first();[m
+[32m+[m[32m      }[m
+     // public function authorizeRoles($roles){[m
+     //     if (is_array($roles)) {[m
+     //         return $this->hasAnyRole($roles) ||[m
+[1mdiff --git a/composer.json b/composer.json[m
+[1mindex aa4215d..d284597 100644[m
+[1m--- a/composer.json[m
+[1m+++ b/composer.json[m
+[36m@@ -15,6 +15,7 @@[m
+         "laravel/framework": "^7.0",[m
+         "laravel/tinker": "^2.0",[m
+         "laravel/ui": "2.4",[m
+[32m+[m[32m        "mckenziearts/laravel-notify": "^2.1",[m
+         "spatie/laravel-permission": "^4.0",[m
+         "yoeunes/toastr": "^1.2"[m
+     },[m
+[1mdiff --git a/composer.lock b/composer.lock[m
+[1mindex c3f6779..e2ad6cf 100644[m
+[1m--- a/composer.lock[m
+[1m+++ b/composer.lock[m
+[36m@@ -4,7 +4,7 @@[m
+         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",[m
+         "This file is @generated automatically"[m
+     ],[m
+[31m-    "content-hash": "2d8de2cdb20744048314ecf82e082a03",[m
+[32m+[m[32m    "content-hash": "3b795829cd5746a7929f7dc42d2a9839",[m
+     "packages": [[m
+         {[m
+             "name": "asm89/stack-cors",[m
+[36m@@ -1340,6 +1340,72 @@[m
+             ],[m
+             "time": "2021-01-18T20:58:21+00:00"[m
+         },[m
+[32m+[m[32m        {[m
+[32m+[m[32m            "name": "mckenziearts/laravel-notify",[m
+[32m+[m[32m            "version": "v2.1",[m
+[32m+[m[32m            "source": {[m
+[32m+[m[32m                "type": "git",[m
+[32m+[m[32m                "url": "https://github.com/mckenziearts/laravel-notify.git",[m
+[32m+[m[32m                "reference": "1511bb97cf9ce4c3562caf6f3785eb55bad822a6"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "dist": {[m
+[32m+[m[32m                "type": "zip",[m
+[32m+[m[32m                "url": "https://api.github.com/repos/mckenziearts/laravel-notify/zipball/1511bb97cf9ce4c3562caf6f3785eb55bad822a6",[m
+[32m+[m[32m                "reference": "1511bb97cf9ce4c3562caf6f3785eb55bad822a6",[m
+[32m+[m[32m                "shasum": ""[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "require": {[m
+[32m+[m[32m                "illuminate/support": "^7.0|^8.0",[m
+[32m+[m[32m                "php": ">=7.1"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "require-dev": {[m
+[32m+[m[32m                "mockery/mockery": "^1.0",[m
+[32m+[m[32m                "phpunit/phpunit": "^8.0"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "type": "library",[m
+[32m+[m[32m            "extra": {[m
+[32m+[m[32m                "laravel": {[m
+[32m+[m[32m                    "providers": [[m
+[32m+[m[32m                        "Mckenziearts\\Notify\\LaravelNotifyServiceProvider"[m
+[32m+[m[32m                    ],[m
+[32m+[m[32m                    "aliases": {[m
+[32m+[m[32m                        "Notify": "Mckenziearts\\Notify\\Facades\\LaravelNotify"[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "autoload": {[m
+[32m+[m[32m                "psr-4": {[m
+[32m+[m[32m                    "Mckenziearts\\Notify\\": "src/"[m
+[32m+[m[32m                },[m
+[32m+[m[32m                "files": [[m
+[32m+[m[32m                    "src/helpers.php"[m
+[32m+[m[32m                ][m
+[32m+[m[32m            },[m
+[32m+[m[32m            "notification-url": "https://packagist.org/downloads/",[m
+[32m+[m[32m            "license": [[m
+[32m+[m[32m                "MIT"[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "authors": [[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    "name": "Arthur Monney",[m
+[32m+[m[32m                    "email": "monneylobe@gmail.com",[m
+[32m+[m[32m                    "homepage": "https://twitter.com/MonneyArthur",[m
+[32m+[m[32m                    "role": "Developer"[m
+[32m+[m[32m                }[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "description": "Flexible flash notifications for Laravel",[m
+[32m+[m[32m            "homepage": "https://github.com/mckenziearts/laravel-notify",[m
+[32m+[m[32m            "keywords": [[m
+[32m+[m[32m                "laravel",[m
+[32m+[m[32m                "laravel-notify",[m
+[32m+[m[32m                "notification"[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "support": {[m
+[32m+[m[32m                "issues": "https://github.com/mckenziearts/laravel-notify/issues",[m
+[32m+[m[32m                "source": "https://github.com/mckenziearts/laravel-notify/tree/v2.1"[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "time": "2020-09-12T06:14:18+00:00"[m
+[32m+[m[32m        },[m
+         {[m
+             "name": "monolog/monolog",[m
+             "version": "2.2.0",[m
+[1mdiff --git a/config/app.php b/config/app.php[m
+[1mindex 12ff4f9..1a4fe96 100644[m
+[1m--- a/config/app.php[m
+[1m+++ b/config/app.php[m
+[36m@@ -164,6 +164,7 @@[m [mreturn [[m
+         Spatie\Permission\PermissionServiceProvider::class,[m
+         Collective\Html\HtmlServiceProvider::class,[m
+         Yoeunes\Toastr\ToastrServiceProvider::class,[m
+[32m+[m[32m        Mckenziearts\Notify\LaravelNotifyServiceProvider::class,[m
+ [m
+         /*[m
+          * Package Service Providers...[m
+[1mdiff --git a/database/migrations/2021_02_25_144316_create_jobs_table.php b/database/migrations/2021_02_25_144316_create_jobs_table.php[m
+[1mindex 479b108..0914bf7 100644[m
+[1m--- a/database/migrations/2021_02_25_144316_create_jobs_table.php[m
+[1m+++ b/database/migrations/2021_02_25_144316_create_jobs_table.php[m
+[36m@@ -19,6 +19,7 @@[m [mclass CreateJobsTable extends Migration[m
+             $table->string('description');[m
+             $table->string('salaire');[m
+             $table->date('end_date');[m
+[32m+[m[32m            $table->integer('user_id')->unsigned();[m
+             $table->timestamps();[m
+         });[m
+     }[m
+[1mdiff --git a/database/migrations/2021_02_25_190949_create_posts_table.php b/database/migrations/2021_02_25_190949_create_posts_table.php[m
+[1mindex 2d887db..6df10a2 100644[m
+[1m--- a/database/migrations/2021_02_25_190949_create_posts_table.php[m
+[1m+++ b/database/migrations/2021_02_25_190949_create_posts_table.php[m
+[36m@@ -20,6 +20,7 @@[m [mclass CreatePostsTable extends Migration[m
+             $table->string('niveau');[m
+             $table->date('end_date');[m
+             $table->date('start_date');[m
+[32m+[m[32m            $table->integer('user_id')->unsigned();[m
+             $table->timestamps();[m
+         });[m
+     }[m
+[1mdiff --git a/database/seeds/RoleTableSeeder.php b/database/seeds/RoleTableSeeder.php[m
+[1mdeleted file mode 100644[m
+[1mindex 237006a..0000000[m
+[1m--- a/database/seeds/RoleTableSeeder.php[m
+[1m+++ /dev/null[m
+[36m@@ -1,32 +0,0 @@[m
+[31m-<?php[m
+[31m-[m
+[31m-use Illuminate\Database\Seeder;[m
+[31m-[m
+[31m-class RoleTableSeeder extends Seeder[m
+[31m-{[m
+[31m-    /**[m
+[31m-     * Run the database seeds.[m
+[31m-     *[m
+[31m-     * @return void[m
+[31m-     */[m
+[31m-    public function run()[m
+[31m-    {[m
+[31m-         $admin = \App\Models\Role::create([[m
+[31m-             'name'=> 'admin',[m
+[31m-           [m
+[31m-         ]);[m
+[31m-[m
+[31m-[m
+[31m-         $recruteur = \App\Models\Role::create([[m
+[31m-             'name'=> 'recruteur',[m
+[31m-           [m
+[31m-[m
+[31m-        ]);[m
+[31m-         $user = \App\Models\Role::create([[m
+[31m-             'name'=> 'user',[m
+[31m-           [m
+[31m-[m
+[31m-        ]);[m
+[31m-[m
+[31m-        }[m
+[31m-}[m
+[1mdiff --git a/resources/views/admin/permission/create.blade.php b/resources/views/admin/permission/create.blade.php[m
+[1mindex 78ce9bb..be47337 100644[m
+[1m--- a/resources/views/admin/permission/create.blade.php[m
+[1m+++ b/resources/views/admin/permission/create.blade.php[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-@extends('layouts.app')[m
+[32m+[m[32m@extends('layouts.master')[m
+ [m
+ @section('content')[m
+     <div class="container">[m
+[1mdiff --git a/resources/views/admin/permission/show.blade.php b/resources/views/admin/permission/show.blade.php[m
+[1mindex 5e83cd4..e304fa9 100644[m
+[1m--- a/resources/views/admin/permission/show.blade.php[m
+[1m+++ b/resources/views/admin/permission/show.blade.php[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-@extends('layouts.app')[m
+[32m+[m[32m@extends('layouts.master')[m
+ [m
+ @section('content')[m
+     <div class="container">[m
+[1mdiff --git a/resources/views/admin/role/edit.blade.php b/resources/views/admin/role/edit.blade.php[m
+[1mindex 7fedad8..dbe176f 100644[m
+[1m--- a/resources/views/admin/role/edit.blade.php[m
+[1m+++ b/resources/views/admin/role/edit.blade.php[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-@extends('layouts.app')[m
+[32m+[m[32m@extends('layouts.master')[m
+ [m
+ @section('content')[m
+     <div class="container">[m
+[1mdiff --git a/resources/views/admin/role/show.blade.php b/resources/views/admin/role/show.blade.php[m
+[1mindex 0bd4c75..084fa64 100644[m
+[1m--- a/resources/views/admin/role/show.blade.php[m
+[1m+++ b/resources/views/admin/role/show.blade.php[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-@extends('layouts.app')[m
+[32m+[m[32m@extends('layouts.master')[m
+ [m
+ @section('content')[m
+     <div class="container">[m
+[1mdiff --git a/resources/views/auth/login.blade.php b/resources/views/auth/login.blade.php[m
+[1mindex 2afa04d..34d9768 100644[m
+[1m--- a/resources/views/auth/login.blade.php[m
+[1m+++ b/resources/views/auth/login.blade.php[m
+[36m@@ -82,7 +82,7 @@[m
+     height: 100%;[m
+     display: inline-block;[m
+     float: right;[m
+[31m-    border-radius: 10%;[m
+[32m+[m[41m    [m
+ }[m
+ </style>[m
+ @endpush[m
+\ No newline at end of file[m
+[1mdiff --git a/resources/views/auth/register.blade.php b/resources/views/auth/register.blade.php[m
+[1mindex 92151b9..ce03ea8 100644[m
+[1m--- a/resources/views/auth/register.blade.php[m
+[1m+++ b/resources/views/auth/register.blade.php[m
+[36m@@ -112,7 +112,7 @@[m
+     background-size: cover;[m
+     background-position: center;[m
+     height: 100%;[m
+[31m-    padding-right: 100px;[m
+[32m+[m[41m  [m
+     [m
+ }[m
+ </style>[m
+[1mdiff --git a/resources/views/dachboard/dach.blade.php b/resources/views/dachboard/dach.blade.php[m
+[1mindex ce71f84..2fea1b6 100644[m
+[1m--- a/resources/views/dachboard/dach.blade.php[m
+[1m+++ b/resources/views/dachboard/dach.blade.php[m
+[36m@@ -52,28 +52,7 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+           <span class="navbar-toggler-icon"></span>[m
+         </button>[m
+       </div>[m
+[31m-      <div class="collapse navbar-collapse">[m
+[31m-        <ul class="navbar-nav ml-auto">[m
+[31m-          <li class="dropdown nav-item">[m
+[31m-            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">[m
+[31m-              <i class="material-icons">apps</i> Components[m
+[31m-            </a>[m
+[31m-            <div class="dropdown-menu dropdown-with-icons">[m
+[31m-              <a href="./index.html" class="dropdown-item">[m
+[31m-                <i class="material-icons">layers</i> All Components[m
+[31m-              </a>[m
+[31m-              <a href="https://demos.creative-tim.com/material-kit/docs/2.0/getting-started/introduction.html" class="dropdown-item">[m
+[31m-                <i class="material-icons">content_paste</i> Documentation[m
+[31m-              </a>[m
+[31m-            </div>[m
+[31m-          </li>[m
+[31m-          <a href="#" >[m
+[31m-            <button class="btn btn-primary btn-fab ">[m
+[31m-              [m
+[31m-            </button>[m
+[31m-            <button class="btn btn-primary btn-link">Simple</button></a>[m
+[31m-        </ul>[m
+[31m-      </div>[m
+[32m+[m[41m     [m
+     </div>[m
+   </nav>[m
+   <div class="page-header header-filter clear-filter purple-filter" data-parallax="true" style="background-image: url('./assets/img/bg2.jpg');">[m
+[36m@@ -90,10 +69,81 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+   </div>[m
+   <div class="main main-raised">[m
+     <div class="section section-basic">[m
+[31m-     [m
+[31m-  [m
+[31m-<!-- Posts-->[m
+[31m-<div class="row">[m
+[32m+[m[32m     <div class="container">[m
+[32m+[m[32m   <!-- Small Box (Stat card) -->[m
+[32m+[m[32m   <div class="row">[m
+[32m+[m[32m     <div class="col-lg-3 col-6">[m
+[32m+[m[32m       <!-- small card -->[m
+[32m+[m[32m       <div class="small-box bg-info">[m
+[32m+[m[32m         <div class="inner">[m
+[32m+[m[32m           <h3>{{$posts->count()}}</h3>[m
+[32m+[m
+[32m+[m[32m           <p>Stages</p>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <div class="icon">[m
+[32m+[m[32m          <i class="far fa-calendar-alt"></i>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <a href="#" class="small-box-footer">[m
+[32m+[m[32m           More info <i class="fas fa-arrow-circle-right"></i>[m
+[32m+[m[32m         </a>[m
+[32m+[m[32m       </div>[m
+[32m+[m[32m     </div>[m
+[32m+[m[32m     <!-- ./col -->[m
+[32m+[m[32m     <div class="col-lg-3 col-6">[m
+[32m+[m[32m       <!-- small card -->[m
+[32m+[m[32m       <div class="small-box bg-success">[m
+[32m+[m[32m         <div class="inner">[m
+[32m+[m[32m           <h3>{{$jobs->count()}}<sup style="font-size: 20px">%</sup></h3>[m
+[32m+[m
+[32m+[m[32m           <p>Jobs</p>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <div class="icon">[m
+[32m+[m[32m           <i class="ion ion-stats-bars"></i>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <a href="#" class="small-box-footer">[m
+[32m+[m[32m           More info <i class="fas fa-arrow-circle-right"></i>[m
+[32m+[m[32m         </a>[m
+[32m+[m[32m       </div>[m
+[32m+[m[32m     </div>[m
+[32m+[m[32m     <!-- ./col -->[m
+[32m+[m[32m     <div class="col-lg-3 col-6">[m
+[32m+[m[32m       <!-- small card -->[m
+[32m+[m[32m       <div class="small-box bg-warning">[m
+[32m+[m[32m         <div class="inner">[m
+[32m+[m[32m           <h3>{{$users->count()}}</h3>[m
+[32m+[m
+[32m+[m[32m           <p>User Registrations</p>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <div class="icon">[m
+[32m+[m[32m           <i class="fas fa-user-plus"></i>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <a href="#" class="small-box-footer">[m
+[32m+[m[32m           More info <i class="fas fa-arrow-circle-right"></i>[m
+[32m+[m[32m         </a>[m
+[32m+[m[32m       </div>[m
+[32m+[m[32m     </div>[m
+[32m+[m[32m     <!-- ./col -->[m
+[32m+[m[32m     <div class="col-lg-3 col-6">[m
+[32m+[m[32m       <!-- small card -->[m
+[32m+[m[32m       <div class="small-box bg-danger">[m
+[32m+[m[32m         <div class="inner">[m
+[32m+[m[32m           <h3>65</h3>[m
+[32m+[m
+[32m+[m[32m           <p>Unique Visitors</p>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <div class="icon">[m
+[32m+[m[32m           <i class="fas fa-chart-pie"></i>[m
+[32m+[m[32m         </div>[m
+[32m+[m[32m         <a href="#" class="small-box-footer">[m
+[32m+[m[32m           More info <i class="fas fa-arrow-circle-right"></i>[m
+[32m+[m[32m         </a>[m
+[32m+[m[32m       </div>[m
+[32m+[m[32m     </div>[m
+[32m+[m[32m     <!-- ./col -->[m
+[32m+[m[32m   </div>[m
+[32m+[m[32m  </div>[m
+[32m+[m
+[32m+[m[32m<div class="row" >[m
+   <!-- Main content -->[m
+   [m
+         <div class="container">[m
+[36m@@ -104,8 +154,8 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+                   [m
+               [m
+               <div class="card">[m
+[31m-                <div class="card-header">[m
+[31m-                  <h3 class="card-title">{{$job->titre}}</h3>[m
+[32m+[m[32m                <div class="card-header"><span class="badge badge-warning">Offre de Emplois</span>[m
+[32m+[m[32m                  <h3 class="card-title">{{ \Illuminate\Support\Str::limit($job->titre, 35) }}</h3>[m
+   [m
+                   <div class="card-tools">[m
+                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">[m
+[36m@@ -115,45 +165,37 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+                   </div>[m
+                 </div>[m
+                 <div class="card-body">[m
+[31m-                  {{$job->description}}[m
+[31m-                  {{$job->salaire}}[m
+[32m+[m[32m                  <p class="card-text">  {!! \Illuminate\Support\Str::limit($job->description, 150, $end='...') !!}</p>[m
+[32m+[m[32m                 <div class="badge badge-success"><span>Salaire proposée :</span> {{$job->salaire}}</div>[m
+[32m+[m[32m                 <p><b>By {{ \App\User::find($job->user_id)->name }}</b></p>[m
+[32m+[m[32m                          @if(!Auth::user()->isSubscribedJob($job->id))[m
+[32m+[m[32m                            <form method="POST" class="btn" action="{{route('subscribe',$job->id)}}">[m
+[32m+[m[32m                                @csrf[m
+[32m+[m[32m                                @method('PUT')[m
+[32m+[m[32m                                <button class="btn btn-success"  type="submit">Subscribe</button>[m
+[32m+[m[32m                            </form>[m
+[32m+[m[32m                          @else[m
+[32m+[m[32m                          <button class="btn btn-danger">Subscribed</button>[m
+[32m+[m[32m                          @endif[m
+                 </div>[m
+                 <!-- /.card-body -->[m
+                 <div class="card-footer">[m
+[31m-                  {{$job->end_date}}[m
+[32m+[m[32m                  {{$job->end_date}}[m[41m  [m
+                 </div>[m
+                 <!-- /.card-footer-->[m
+               </div>[m
+               @endforeach[m
+[31m-              <div class="col">[m
+[31m-                <div class="card">[m
+[31m-                  <div class="card-header">[m
+[31m-                    <h3 class="card-title">Title</h3>[m
+[31m-    [m
+[31m-                    <div class="card-tools">[m
+[31m-                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">[m
+[31m-                        <i class="fas fa-minus"></i></button>[m
+[31m-                      <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">[m
+[31m-                        <i class="fas fa-times"></i></button>[m
+[31m-                    </div>[m
+[31m-                  </div>[m
+[31m-                  <div class="card-body">[m
+[31m-                    Start creating your amazing application![m
+[31m-                  </div>[m
+[31m-                  <!-- /.card-body -->[m
+[31m-                  <div class="card-footer">[m
+[31m-                    Footer[m
+[31m-                  </div>[m
+[31m-                  <!-- /.card-footer-->[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-              <!-- /.card -->[m
+[32m+[m[41m              [m
+             </div>[m
+[32m+[m[32m            {{ $jobs->links() }}[m
+             <div class="col">[m
+[31m-              <!-- Default box -->[m
+[32m+[m[32m              @foreach ($posts as $post)[m
+[32m+[m
+               <div class="card">[m
+[31m-                <div class="card-header">[m
+[31m-                  <h3 class="card-title">Title</h3>[m
+[32m+[m[32m                <div class="card-header"><span class="badge badge-warning">Offre de Stage</span>[m
+[32m+[m[41m    [m
+[32m+[m
+[32m+[m[32m                  <h3 class="card-title">{{$post->titre}}</h3>[m
+   [m
+                   <div class="card-tools">[m
+                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">[m
+[36m@@ -163,38 +205,28 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+                   </div>[m
+                 </div>[m
+                 <div class="card-body">[m
+[31m-                  Start creating your amazing application![m
+[32m+[m[32m                  <p class="card-text">  {!! \Illuminate\Support\Str::limit($post->description, 150, $end='...') !!}</p>[m
+[32m+[m[32m                 <div class="badge badge-success"><span>Niveaux proposée :</span> {{$post->niveau}}</div>[m
+[32m+[m[32m                 <p><b>By {{ \App\User::find($post->user_id)->name }}</b></p>[m
+[32m+[m[32m                 @if(!Auth::user()->isSubscribedPost($post->id))[m
+[32m+[m[32m                   <form method="POST" class="btn" action="{{route('subscribe',$post->id)}}">[m
+[32m+[m[32m                       @csrf[m
+[32m+[m[32m                       @method('PUT')[m
+[32m+[m[32m                       <button class="btn btn-success"  type="submit">Subscribe</button>[m
+[32m+[m[32m                   </form>[m
+[32m+[m[32m                 @else[m
+[32m+[m[32m                 <button class="btn btn-danger">Subscribed</button>[m
+[32m+[m[32m                 @endif[m
+                 </div>[m
+                 <!-- /.card-body -->[m
+                 <div class="card-footer">[m
+[31m-                  Footer[m
+[32m+[m[32m                <Label> Date de debut:</Label> {{$post->start_date}} - <label for=""> Date de fin:</label>{{$post->end_date}}[m
+                 </div>[m
+[31m-                <!-- /.card-footer-->[m
+[32m+[m[32m                @endforeach[m
+               </div>[m
+[31m-              <div class="col">[m
+[31m-                <div class="card">[m
+[31m-                  <div class="card-header">[m
+[31m-                    <h3 class="card-title">Title</h3>[m
+[31m-    [m
+[31m-                    <div class="card-tools">[m
+[31m-                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">[m
+[31m-                        <i class="fas fa-minus"></i></button>[m
+[31m-                      <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">[m
+[31m-                        <i class="fas fa-times"></i></button>[m
+[31m-                    </div>[m
+[31m-                  </div>[m
+[31m-                  <div class="card-body">[m
+[31m-                    Start creating your amazing application![m
+[31m-                  </div>[m
+[31m-                  <!-- /.card-body -->[m
+[31m-                  <div class="card-footer">[m
+[31m-                    Footer[m
+[31m-                  </div>[m
+[31m-                  <!-- /.card-footer-->[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-              <!-- /.card -->[m
+[31m-            </div>[m
+[32m+[m[32m                {{ $posts->links() }}[m[41m              [m
+[32m+[m[41m            [m
+[32m+[m[32m            </div>[m[41m [m
+           </div>[m
+         </div>[m
+       </section>[m
+[36m@@ -213,12 +245,8 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+   <script src="{{asset('assets/js/core/popper.min.js')}}" type="text/javascript"></script>[m
+   <script src="{{asset('assets/js/core/bootstrap-material-design.min.js')}}" type="text/javascript"></script>[m
+   <script src="{{asset('assets/js/plugins/moment.min.js')}}"></script>[m
+[31m-  <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->[m
+   <script src="{{asset('assets/js/plugins/bootstrap-datetimepicker.js')}}" type="text/javascript"></script>[m
+[31m-  <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->[m
+   <script src="{{asset('assets/js/plugins/nouislider.min.js')}}" type="text/javascript"></script>[m
+[31m-  <!--  Google Maps Plugin    -->[m
+[31m-  <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->[m
+   <script src="{{asset('assets/js/material-kit.js?v=2.0.7')}}" type="text/javascript"></script>[m
+   <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>[m
+ <!-- Bootstrap 4 -->[m
+[36m@@ -232,7 +260,7 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+ <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>[m
+ <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>[m
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>[m
+[31m-  <script>[m
+[32m+[m[32m <script>[m
+     $(document).ready(function() {[m
+       //init DateTimePickers[m
+       materialKit.initFormExtendedDatetimepickers();[m
+[36m@@ -249,7 +277,7 @@[m [mThe above copyright notice and this permission notice shall be included in all c[m
+         }, 1000);[m
+       }[m
+     }[m
+[31m-  </script>[m
+[32m+[m[32m  </script>[m[41m [m
+ </body>[m
+ [m
+ </html>[m
+\ No newline at end of file[m
+[1mdiff --git a/resources/views/job/create.blade.php b/resources/views/job/create.blade.php[m
+[1mindex 05fa523..ec8efd5 100644[m
+[1m--- a/resources/views/job/create.blade.php[m
+[1m+++ b/resources/views/job/create.blade.php[m
+[36m@@ -44,7 +44,7 @@[m
+     [m
+     <div class="form-group">[m
+         <strong>description</strong>[m
+[31m-          <textarea name="description" class="form-control" cols="30" rows="10"></textarea>[m
+[32m+[m[32m          <textarea name="description" class="form-control" cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"></textarea>[m
+     </div>[m
+     [m
+     <div class="col-xs-12 col-sm-12 col-md-12 text-center">[m
+[1mdiff --git a/resources/views/job/edit.blade.php b/resources/views/job/edit.blade.php[m
+[1mindex dd4675a..f5a0911 100644[m
+[1m--- a/resources/views/job/edit.blade.php[m
+[1m+++ b/resources/views/job/edit.blade.php[m
+[36m@@ -11,17 +11,6 @@[m
+             </div>[m
+         </div>[m
+     </div>[m
+[31m-       [m
+[31m-    @if ($errors->any())[m
+[31m-        <div class="alert alert-danger">[m
+[31m-            <strong>Whoops!</strong> There were some problems with your input.<br><br>[m
+[31m-            <ul>[m
+[31m-                @foreach ($errors->all() as $error)[m
+[31m-                    <li>{{ $error }}</li>[m
+[31m-                @endforeach[m
+[31m-            </ul>[m
+[31m-        </div>[m
+[31m-    @endif[m
+     <form action="{{route('job.update',$job->id)}}" method="POST">[m
+     @csrf[m
+     @method('PUT')[m
+[36m@@ -41,7 +30,7 @@[m
+     [m
+     <div class="form-group">[m
+         <strong>description</strong>[m
+[31m-    <textarea name="description" class="form-control"  cols="30" rows="10"> {{$job->description}}</textarea>[m
+[32m+[m[32m    <textarea name="description" class="form-control"  cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"> {{$job->description}}</textarea>[m
+     </div>[m
+     [m
+     <div class="col-xs-12 col-sm-12 col-md-12 text-center">[m
+[36m@@ -49,5 +38,60 @@[m
+ </div>[m
+     </form>   [m
+ </div>[m
+[32m+[m[32m<div class="col-md-12 col-lg-12">[m
+[32m+[m[32m    <div class="card">[m
+[32m+[m[32m                    <div class="card-header">[m
+[32m+[m[32m                      <i class="fa fa-align-justify"></i>{{ __('Subscribed Users') }}[m
+[32m+[m[41m                     [m
+[32m+[m[32m                    <div class="card-body">[m
+[32m+[m[32m                        <table class="table table-responsive-sm table-striped">[m
+[32m+[m[32m                        <thead>[m
+[32m+[m[32m                          <tr>[m
+[32m+[m[32m                            <th>ID</th>[m
+[32m+[m[32m                            <th>Username</th>[m
+[32m+[m[32m                            <th>E-mail</th>[m
+[32m+[m[32m                            <th>Status</th>[m
+[32m+[m[32m                            <th></th>[m
+[32m+[m[32m                            <th></th>[m
+[32m+[m[32m                          </tr>[m
+[32m+[m[32m                        </thead>[m
+[32m+[m[32m                        <tbody>[m
+[32m+[m[32m                          @foreach($users as $key => $user)[m
+[32m+[m[32m                            <tr>[m
+[32m+[m[32m                              <th>{{ ++$key }}</th>[m
+[32m+[m[32m                              <td><b>{{ $user->name }}</b></td>[m
+[32m+[m[32m                              <td>{{ $user->email }}</td>[m
+[32m+[m[32m                              <td>{{ $user->status }}</td>[m
+[32m+[m[32m                              <td>[m
+[32m+[m[32m                                @if($user->status != 'approved')[m
+[32m+[m[32m                                  <form method="POST" action="{{route('approve',[$user->id,$job->id])}}">[m
+[32m+[m[32m                                      @csrf[m
+[32m+[m[32m                                      @method('PUT')[m
+[32m+[m[32m                                      <button class="btn btn-success"  type="submit">Approve</button>[m
+[32m+[m[32m                                  </form>[m
+[32m+[m[32m                                @else[m
+[32m+[m[32m                                  <form method="POST" action="/jobs/unapprove/{{$user->id}}/{{$job->id}}">[m
+[32m+[m[32m                                      @csrf[m
+[32m+[m[32m                                      @method('PUT')[m
+[32m+[m[32m                                      <button class="btn btn-danger"  type="submit">Unapprove</button>[m
+[32m+[m[32m                                  </form>[m
+[32m+[m[32m                                @endif[m
+[32m+[m[32m                                </td>[m
+[32m+[m[32m                                <td>[m
+[32m+[m[32m                                @if($user->status == 'pending')[m
+ [m
+[32m+[m[32m                                <form method="POST" action="/jobs/remove/{{$user->id}}/{{$job->id}}">[m
+[32m+[m[32m                                    @csrf[m
+[32m+[m[32m                                    @method('PUT')[m
+[32m+[m[32m                                    <button class="btn btn-danger"  type="submit">Remove</button>[m
+[32m+[m[32m                                </form>[m
+[32m+[m[32m                                @endif[m
+[32m+[m[32m                              </td>[m
+[32m+[m[32m                            </tr>[m
+[32m+[m[32m                          @endforeach[m
+[32m+[m[32m                        </tbody>[m
+[32m+[m[32m                      </table>[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m  </div>[m
+ @endsection[m
+\ No newline at end of file[m
+[1mdiff --git a/resources/views/job/index.blade.php b/resources/views/job/index.blade.php[m
+[1mindex f0ba6bf..0fb0dbd 100644[m
+[1m--- a/resources/views/job/index.blade.php[m
+[1m+++ b/resources/views/job/index.blade.php[m
+[36m@@ -9,7 +9,7 @@[m
+ }[m
+ </style>[m
+ <div class="col-lg-3 col-6">[m
+[31m-    [m
+[32m+[m[32m  @include('notify::messages')[m
+     <div class="small-box bg-info">[m
+       <div class="inner">[m
+         <h3> {{$jobs->count()}} </h3>[m
+[36m@@ -25,35 +25,35 @@[m
+ <div class="container">[m
+     <div class="row">[m
+         <div class="topright">[m
+[31m-            <a class="btn btn-success mb-5" href="{{ route('job.create') }}" style="panding-left"> Create New Product</a>[m
+[32m+[m[32m            <a class="btn btn-success mb-5" href="{{ route('job.create') }}" style="panding-left"><i class="fa fa-plus"></i></a>[m
+         </div>[m
+[31m- [m
+[31m-    <table class="table table-bordered">[m
+[32m+[m[32m        <div class="card-body">[m
+[32m+[m[32m          <table class="table table-responsive-sm table-striped">[m
+         <tr>[m
+             <th>ID</th>[m
+             <th>Title</th>[m
+[31m-            <th>Content</th>[m
+[32m+[m[41m            [m
+             <th>Salaire</th>[m
+             <th>Date de fin</th>[m
+             <th width="280px">Action</th>[m
+         </tr>[m
+         @foreach ($jobs as $job)[m
+         <tr>[m
+[31m-            <td>{{ $job->id }}</td>[m
+[32m+[m[32m            <td>{{ \App\User::find($job->user_id)->name }}</td>[m
+             <td>{{ $job->titre}}</td>[m
+[31m-            <td>{{ $job->description}}</td>[m
+[32m+[m[41m            [m
+             <td>{{ $job->salaire}}</td>[m
+             <td>{{ $job->end_date}}</td>[m
+             <td>[m
+                 <form action="{{ route('job.destroy',$job->id) }}" method="POST">[m
+    [m
+[31m-                <a class="btn btn-info" href="{{ route('job.show',$job->id)}}">Show</a>[m
+[32m+[m[32m                <a class="btn btn-info" href="{{ route('job.show',$job->id)}}"><i class="fa fa-list"></i></a>[m
+     [m
+[31m-                <a class="btn btn-primary" href="{{ route('job.edit',$job->id)}}">Edit</a>[m
+[32m+[m[32m                <a class="btn btn-primary" href="{{ route('job.edit',$job->id)}}"><i class="fa fa-edit" aria-hidden="true"></i></a>[m
+                        @csrf[m
+                      @method('delete')[m
+                     [m
+[31m-                    <button type="submit" class="btn btn-danger">Delete</button>[m
+[32m+[m[32m                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>[m
+                 </form>[m
+             </td>[m
+         </tr>[m
+[36m@@ -61,6 +61,61 @@[m
+     </table>[m
+     </div>[m
+   {{ $jobs->links() }}[m
+[32m+[m[32m</div>[m
+[32m+[m[32m</div>[m
+[32m+[m[32m<div class="col-md-12 col-lg-12">[m
+[32m+[m[32m  <div class="card">[m
+[32m+[m[41m                  [m
+[32m+[m[32m                  {{-- <div class="card-body">[m
+[32m+[m[32m                      <table class="table table-responsive-sm table-striped">[m
+[32m+[m[32m                      <thead>[m
+[32m+[m[32m                        <tr>[m
+[32m+[m[32m                          <th>ID</th>[m
+[32m+[m[32m                          <th>Username</th>[m
+[32m+[m[32m                          <th>E-mail</th>[m
+[32m+[m[32m                          <th>Status</th>[m
+[32m+[m[32m                          <th></th>[m
+[32m+[m[32m                          <th></th>[m
+[32m+[m[32m                        </tr>[m
+[32m+[m[32m                      </thead>[m
+[32m+[m[32m                      <tbody>[m
+[32m+[m[32m                        @foreach($users as $key => $user)[m
+[32m+[m[32m                          <tr>[m
+[32m+[m[32m                            <th>{{ ++$key }}</th>[m
+[32m+[m[32m                            <td><b>{{ $user->name }}</b></td>[m
+[32m+[m[32m                            <td>{{ $user->email }}</td>[m
+[32m+[m[32m                            <td>{{ $user->status }}</td>[m
+[32m+[m[32m                            <td>[m
+[32m+[m[32m                              @if($user->status != 'approved')[m
+[32m+[m[32m                                <form method="POST" action="/job/approve/{{$user->id}}/{{$job->id}}">[m
+[32m+[m[32m                                    @csrf[m
+[32m+[m[32m                                    @method('PUT')[m
+[32m+[m[32m                                    <button class="btn btn-success"  type="submit">Approve</button>[m
+[32m+[m[32m                                </form>[m
+[32m+[m[32m                              @else[m
+[32m+[m[32m                                <form method="POST" action="/job/unapprove/{{$user->id}}/{{$job->id}}">[m
+[32m+[m[32m                                    @csrf[m
+[32m+[m[32m                                    @method('PUT')[m
+[32m+[m[32m                                    <button class="btn btn-danger"  type="submit">Unapprove</button>[m
+[32m+[m[32m                                </form>[m
+[32m+[m[32m                              @endif[m
+[32m+[m[32m                              </td>[m
+[32m+[m[32m                              <td>[m
+[32m+[m[32m                              @if($user->status == 'pending')[m
+[32m+[m
+[32m+[m[32m                              <form method="POST" action="/job/remove/{{$user->id}}/{{$job->id}}">[m
+[32m+[m[32m                                  @csrf[m
+[32m+[m[32m                                  @method('PUT')[m
+[32m+[m[32m                                  <button class="btn btn-danger"  type="submit">Remove</button>[m
+[32m+[m[32m                              </form>[m
+[32m+[m[32m                              @endif[m
+[32m+[m[32m                            </td>[m
+[32m+[m[32m                          </tr>[m
+[32m+[m[32m                        @endforeach[m
+[32m+[m[32m                      </tbody>[m
+[32m+[m[32m                    </table>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m              </div> --}}[m
+ </div>[m
+     <script>[m
+         @jquery[m
+[1mdiff --git a/resources/views/layouts/master.blade.php b/resources/views/layouts/master.blade.php[m
+[1mindex 0059acd..6ca2e5d 100644[m
+[1m--- a/resources/views/layouts/master.blade.php[m
+[1m+++ b/resources/views/layouts/master.blade.php[m
+[36m@@ -7,9 +7,10 @@[m
+   <!-- Tell the browser to be responsive to screen width -->[m
+   <meta name="viewport" content="width=device-width, initial-scale=1">[m
+   <!-- Font Awesome -->[m
+[31m-  @toastr_css[m
+[32m+[m[32m  @notifyCss[m
+   <link href="{{ asset('css/app.css') }}" rel="stylesheet">[m
+ <link href="{{ asset('css/toastr.css') }}" rel="stylesheet">[m
+[32m+[m[32m<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">[m
+ [m
+   <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">[m
+   <!-- Ionicons -->[m
+[36m@@ -49,10 +50,10 @@[m
+   <link href="{{ asset('css/app.css') }}" rel="stylesheet">[m
+   <!-- Google Font: Source Sans Pro -->[m
+   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">[m
+[32m+[m[32m<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>[m
+ </head>[m
+ <body class="hold-transition sidebar-mini layout-fixed">[m
+ <div class="wrapper">[m
+[31m-[m
+  @include('front.nav')[m
+ [m
+   <!-- Main Sidebar Container -->[m
+[36m@@ -99,6 +100,10 @@[m
+ <!-- ./wrapper -->[m
+ [m
+ <!-- jQuery -->[m
+[32m+[m[32m<script src="{{ asset('ckeditor/ckeditor.js') }}"></script>[m
+[32m+[m[32m<script>[m
+[32m+[m[32mCKEDITOR.replace( 'summary-ckeditor' );[m
+[32m+[m[32m</script>[m
+ <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>[m
+ <!-- jQuery UI 1.11.4 -->[m
+ <script src="{{asset('plugins/jquery-ui/jquery-ui.min.js')}}"></script>[m
+[36m@@ -137,8 +142,8 @@[m
+ <script[m
+   type="text/javascript"[m
+   src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.js"></script>[m
+[31m-@jquery[m
+[31m-    @toastr_js[m
+[31m-    @toastr_render[m
+[32m+[m[32m  <x:notify-messages/>[m
+[32m+[m[32m  @notifyJs[m
+[32m+[m[41m  [m
+ </body>[m
+ </html>[m
+[1mdiff --git a/resources/views/post/create.blade.php b/resources/views/post/create.blade.php[m
+[1mindex 967d4d9..1369f63 100644[m
+[1m--- a/resources/views/post/create.blade.php[m
+[1m+++ b/resources/views/post/create.blade.php[m
+[36m@@ -48,7 +48,7 @@[m
+     [m
+     <div class="form-group">[m
+         <strong>description</strong>[m
+[31m-          <textarea name="description" class="form-control" cols="30" rows="10"></textarea>[m
+[32m+[m[32m          <textarea name="description" class="form-control" cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"></textarea>[m
+     </div>[m
+     [m
+     <div class="col-xs-12 col-sm-12 col-md-12 text-center">[m
+[1mdiff --git a/resources/views/post/edit.blade.php b/resources/views/post/edit.blade.php[m
+[1mindex 2bdfe75..25a3651 100644[m
+[1m--- a/resources/views/post/edit.blade.php[m
+[1m+++ b/resources/views/post/edit.blade.php[m
+[36m@@ -45,7 +45,7 @@[m
+     [m
+     <div class="form-group">[m
+         <strong>description</strong>[m
+[31m-    <textarea name="description" class="form-control"  cols="30" rows="10"> {{$post->description}}</textarea>[m
+[32m+[m[32m    <textarea name="description" class="form-control"  cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"> {{$post->description}}</textarea>[m
+     </div>[m
+     [m
+     <div class="col-xs-12 col-sm-12 col-md-12 text-center">[m
+[36m@@ -53,5 +53,59 @@[m
+ </div>[m
+     </form>   [m
+ </div>[m
+[32m+[m[32m<div class="col-md-12 col-lg-12">[m
+[32m+[m[32m    <div class="card">[m
+[32m+[m[32m                    <div class="card-header">[m
+[32m+[m[32m                      <i class="fa fa-align-justify"></i>{{ __('Subscribed Users') }}[m
+[32m+[m[41m                     [m
+[32m+[m[32m                    <div class="card-body">[m
+[32m+[m[32m                        <table class="table table-responsive-sm table-striped">[m
+[32m+[m[32m                        <thead>[m
+[32m+[m[32m                          <tr>[m
+[32m+[m[32m                            <th>ID</th>[m
+[32m+[m[32m                            <th>Username</th>[m
+[32m+[m[32m                            <th>E-mail</th>[m
+[32m+[m[32m                            <th>Status</th>[m
+[32m+[m[32m                            <th></th>[m
+[32m+[m[32m                            <th></th>[m
+[32m+[m[32m                          </tr>[m
+[32m+[m[32m                        </thead>[m
+[32m+[m[32m                        <tbody>[m
+[32m+[m[32m                          @foreach($users as $key => $user)[m
+[32m+[m[32m                            <tr>[m
+[32m+[m[32m                              <th>{{ ++$key }}</th>[m
+[32m+[m[32m                              <td><b>{{ $user->name }}</b></td>[m
+[32m+[m[32m                              <td>{{ $user->email }}</td>[m
+[32m+[m[32m                              <td>{{ $user->status }}</td>[m
+[32m+[m[32m                              <td>[m
+[32m+[m[32m                                @if($user->status != 'approved')[m
+[32m+[m[32m                                  <form method="POST" action="{{route('approve',[$user->id,$post->id])}}">[m
+[32m+[m[32m                                      @csrf[m
+[32m+[m[32m                                      @method('PUT')[m
+[32m+[m[32m                                      <button class="btn btn-success"  type="submit">Approve</button>[m
+[32m+[m[32m                                  </form>[m
+[32m+[m[32m                                @else[m
+[32m+[m[32m                                  <form method="POST" action="{{route('unapprove',[$user->id,$post->id])}}">[m
+[32m+[m[32m                                      @csrf[m
+[32m+[m[32m                                      @method('PUT')[m
+[32m+[m[32m                                      <button class="btn btn-danger"  type="submit">Unapprove</button>[m
+[32m+[m[32m                                  </form>[m
+[32m+[m[32m                                @endif[m
+[32m+[m[32m                                </td>[m
+[32m+[m[32m                                <td>[m
+[32m+[m[32m                                @if($user->status == 'pending')[m
+ [m
+[32m+[m[32m                                <form method="POST" action="{{route('remove',[$user->id,$post->id])}}">[m
+[32m+[m[32m                                    @csrf[m
+[32m+[m[32m                                    @method('PUT')[m
+[32m+[m[32m                                    <button class="btn btn-danger"  type="submit">Remove</button>[m
+[32m+[m[32m                                </form>[m
+[32m+[m[32m                                @endif[m
+[32m+[m[32m                              </td>[m
+[32m+[m[32m                            </tr>[m
+[32m+[m[32m                          @endforeach[m
+[32m+[m[32m                        </tbody>[m
+[32m+[m[32m                      </table>[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                </div>[m
+ @endsection[m
+\ No newline at end of file[m
+[1mdiff --git a/resources/views/post/index.blade.php b/resources/views/post/index.blade.php[m
+[1mindex 6af6c44..d88b5ae 100644[m
+[1m--- a/resources/views/post/index.blade.php[m
+[1m+++ b/resources/views/post/index.blade.php[m
+[36m@@ -8,6 +8,7 @@[m
+   font-size: 18px;[m
+ }[m
+ </style>[m
+[32m+[m[32m<div class="col-lg-3 col-6">[m
+ <div class="small-box bg-danger">[m
+   <div class="inner">[m
+     <h3>{{$posts->count()}}</h3>[m
+[36m@@ -19,6 +20,7 @@[m
+   </div>[m
+   <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>[m
+ </div>[m
+[32m+[m[32m</div>[m
+ <div class="container">[m
+     <div class="row">[m
+         <div class="topright">[m
+[1mdiff --git a/routes/web.php b/routes/web.php[m
+[1mindex 4dc13e2..019079a 100644[m
+[1m--- a/routes/web.php[m
+[1m+++ b/routes/web.php[m
+[36m@@ -29,11 +29,6 @@[m [mRoute::get('/home', 'HomeController@index')->name('home');[m
+ Auth::routes();[m
+ [m
+ Route::get('/home', 'HomeController@index')->name('home');[m
+[31m-// Route::get('/login/admin', 'Auth\LoginController@showAdminLoginForm');[m
+[31m-//     Route::get('/register/admin', 'Auth\RegisterController@showAdminRegisterForm');[m
+[31m-[m
+[31m-   [m
+[31m-[m
+     Route::view('/home', 'home')->middleware('auth');[m
+    [m
+ [m
+[36m@@ -54,8 +49,25 @@[m [mRoute::group(['middleware' => 'role:admin'], function() {[m
+     Route::view('/admin', 'admins.index');[m
+     Route::get('/front', 'FrontController@index');[m
+     Route::get('logout', 'UserController@logout')->name('logout');;[m
+[32m+[m[32m    Route::put('/approve/{uid}/{id}','JobController@approve')->name('approve');[m
+[32m+[m[32m    Route::put('/unapprove/{uid}/{id}','JobController@unapprove')->name('unapprove');[m
+[32m+[m[32m    Route::put('/subscribe/{id}','JobController@subscribe')->name('subscribe');[m
+[32m+[m[32m    // Route::put('/approve/{uid}/{id}','PostController@approve')->name('approve');[m
+[32m+[m[32m    // Route::put('/unapprove/{uid}/{id}','PostController@unapprove')->name('unapprove');[m
+[32m+[m[32m    // Route::put('/subscribe/{id}','PostController@subscribe')->name('subscribe');[m
+ });[m
+ Route::group(['middleware' => 'role:recruteur'], function() {[m
+     Route::resource('/job','JobController');[m
+     Route::resource('/post','PostController');[m
+ });[m
+[32m+[m
+[32m+[m[32mRoute::group(['middleware' => 'role:user'], function() {[m
+[32m+[m[32m    Route::resource('/job','JobController');[m
+[32m+[m[32m    Route::resource('/post','PostController');[m
+[32m+[m[32m    Route::resource('/front','FrontController');[m
+[32m+[m
+[32m+[m[32m    Route::get('logout', 'UserController@logout')->name('logout');;[m
+[32m+[m[32m    Route::put('/approve/{uid}/{id}','JobController@approve')->name('approve');[m
+[32m+[m[32m    Route::put('/unapprove/{uid}/{id}','JobController@unapprove')->name('unapprove');[m
+[32m+[m[32m    Route::put('/subscribe/{id}','JobController@subscribe')->name('subscribe');[m
+[32m+[m[32m});[m

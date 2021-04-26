@@ -44,9 +44,6 @@ Route::group(['middleware' => 'role:admin'], function() {
     Route::resource('admin/job','JobController');
     Route::resource('admin/post','PostController');
     Route::resource('admin/user','UserController');
-    Route::post('/login/admin', 'Auth\LoginController@adminLogin');
-    Route::post('/register/admin', 'Auth\RegisterController@createAdmin');
-    Route::view('/admin', 'admins.index');
     Route::get('/front', 'FrontController@index');
     Route::get('logout', 'UserController@logout')->name('logout');;
     Route::put('/approve/{uid}/{id}','JobController@approve')->name('approve');
@@ -55,9 +52,10 @@ Route::group(['middleware' => 'role:admin'], function() {
     // Route::put('/unapprove/{uid}/{id}','PostController@unapprove')->name('unapprove');
     // Route::put('/subscribe/{id}','PostController@subscribe')->name('subscribe');
 });
-Route::group(['middleware' => 'role:recruteur'], function() {
+Route::group(['middleware' => 'role:recruteur','permission:|edit job|delete job|'], function() {
     Route::resource('/job','JobController');
     Route::resource('/post','PostController');
+    Route::get('/front', 'FrontController@index');
     Route::put('/approve/{uid}/{id}','JobController@approve')->name('approve');
     Route::put('/unapprove/{uid}/{id}','JobController@unapprove')->name('unapprove');
 });
@@ -66,7 +64,7 @@ Route::group(['middleware' => 'role:user'], function() {
     Route::resource('/job','JobController');
     Route::resource('/post','PostController');
 
-
+    Route::get('/front', 'FrontController@index');
     Route::get('logout', 'UserController@logout')->name('logout');;
     Route::put('/approve/{uid}/{id}','JobController@approve')->name('approve');
     Route::put('/unapprove/{uid}/{id}','JobController@unapprove')->name('unapprove');

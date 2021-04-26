@@ -28,6 +28,8 @@ The above copyright notice and this permission notice shall be included in all c
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <!-- CSS Files -->
   <link href="{{asset('assets/css/material-kit.css?v=2.0.7')}}" rel="stylesheet" />
+  <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="{{asset('assets/demo/demo.css')}}" rel="stylesheet" />
   <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
@@ -44,7 +46,40 @@ The above copyright notice and this permission notice shall be included in all c
     <div class="container">
       <div class="navbar-translate">
    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav ml-auto">
+        <!-- Authentication Links -->
+        @guest
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+            </li>
+            @if (Route::has('register'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                </li>
+            @endif
+        @else
+        <li class="nav-item dropdown dropdown-left"> 
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+          <span class="">{{auth()->user()->name}}</span> 
+            <img class="img-profile rounded-circle" src="{{asset('images/user-profile.png')}}" width="40px"> 
+          </a>
+
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                       onclick="event.preventDefault();
+                                     document.getElementById('logout-form').submit();">
+                        {{ __('Logout') }}
+                    </a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                </div>
+            </li>
+        @endguest
+    </ul>
+          {{-- <ul class="navbar-nav ml-auto">
             @auth
             <li class="nav-item dropdown dropdown-left"> 
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
@@ -66,7 +101,7 @@ The above copyright notice and this permission notice shall be included in all c
             @guest
             <a href="/login" class="btn primary-btn">Sign up or Log in</a>
             @endguest
-          </ul>
+          </ul> --}}
         </div>         
         <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
           <span class="sr-only">Toggle navigation</span>
@@ -79,13 +114,13 @@ The above copyright notice and this permission notice shall be included in all c
         <ul class="navbar-nav ml-auto">
          
           <li class="nav-item">
-            <a class="nav-link" href="{{route('myjobs')}}" target="_blank">
-              <i class="material-icons"></i>Liste de mes Demandes D'Emplois
+            <a class="nav-link " href="{{route('myjobs')}}" target="_blank">
+              <i class="material-icons"></i>{{ __('Liste de mes Demandes Des emplois')}}
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{route('myposts')}}" target="_blank">
-              <i class="material-icons"></i>Liste de Mes Demandes de stages 
+              <i class="material-icons"></i>{{ __('Liste de Mes Demandes de stages ')}}
             </a>
           </li>
           <li class="nav-item">
@@ -113,7 +148,7 @@ The above copyright notice and this permission notice shall be included in all c
         <div class="col-md-8 ml-auto mr-auto">
           <div class="brand">
             <h1>Welcome.</h1>
-            <h3>Platforme de Gestion Des offres d'emplois et stages 
+            <h3>Platforme de Gestion Des offres des emplois et stages 
             </h3>
           </div>
         </div>
@@ -220,7 +255,7 @@ The above copyright notice and this permission notice shall be included in all c
                         </span>
                     </a>
                 </div>
-                <a href="{{ url()->previous() }}" class="btn btn-success">{{ __('View All') }}</a>
+                <a href="/front" class="btn btn-success">{{ __('View All') }}</a>
 
             </form>
 
@@ -281,7 +316,7 @@ The above copyright notice and this permission notice shall be included in all c
                         </span>
                     </a>
                 </div>
-                <a href="{{ url()->previous() }}" class="btn btn-info">{{ __('View All') }}</a>
+                <a href="/front" class="btn btn-info">{{ __('View All') }}</a>
 
             </form>
               @foreach ($posts as $post)
@@ -336,6 +371,8 @@ The above copyright notice and this permission notice shall be included in all c
     
   @include('inc.footer')
   <!--   Core JS Files   -->
+  <script src="{{ asset('js/app.js') }}"></script>
+
   <script src="{{asset('assets/js/core/jquery.min.js')}}" type="text/javascript"></script>
   <script src="{{asset('assets/js/core/popper.min.js')}}" type="text/javascript"></script>
   <script src="{{asset('assets/js/core/bootstrap-material-design.min.js')}}" type="text/javascript"></script>

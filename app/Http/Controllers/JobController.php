@@ -13,6 +13,8 @@ class JobController extends Controller
   public function __construct()
   {
       $this->middleware('auth');
+      $this->middleware(['permission:create job|edit job|delete job']);
+
   }
     /**
      * Display a listing of the resource.
@@ -23,7 +25,7 @@ class JobController extends Controller
     {
       
         $jobs = job::with('user')->latest()->paginate(5);
-        toastr()->success('Data has been saved successfully!');
+       // toastr()->success('Data has been saved successfully!');
         return view('job.index',compact('jobs'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
@@ -47,7 +49,7 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-     // if ($request->user()->can('create-job')) { }
+   
             $request->validate ([
                 'titre'=>'required',
                 'description'=>'required',
@@ -66,8 +68,8 @@ class JobController extends Controller
                 $job->user_id = $user->id;
               
               notify()->success('Data has been saved successfully!');
-                              return redirect()->route('job.index');
-                   
+                return redirect()->route('job.index');
+                            
         
     }
 
