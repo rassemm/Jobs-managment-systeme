@@ -1,13 +1,17 @@
 @extends('layouts.master')
 @section('content')
+<style>
+    strong abbr{
+        position: relative;
+        left: 1;
+        color: red;
+    }
+    </style>
 <div class="container">
     <div class="row">
         <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
-                <h2 class="alert alert-default-success" style="width: 75%;">Add New job</h2>
-            </div>
             <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('job.index') }}"> Back</a>
+                <a class="btn btn-primary" href="{{ route('job.index') }}"> <i class="fas fa-backward"></i></a>
             </div>
         </div>
     </div>
@@ -23,27 +27,27 @@
         </div>
     @endif
     <div class="card" style="width: 75%;" >
-        <div class="card-header">
+        <div class="card-header">       
         </div>
             <div class="card-body">
     <form action="{{route('job.store')}}" method="POST">
     @csrf
     <div class="form-group">
-        <strong>Titre</strong>
+        <strong>Titre <abbr title="(obligatoire)" aria-hidden="true">*</abbr></strong>
           <input type="text" name="titre" class="form-control">
     </div>
     <div class="form-group">
-        <strong>Salaire</strong>
+        <strong>Salaire <abbr title="(obligatoire)" aria-hidden="true">*</abbr></strong>
           <input type="number" name="salaire" class="form-control">
     </div>
     <div class="form-group">
-        <strong>Date de fin</strong>
+        <strong>Date de fin <abbr title="(obligatoire)" aria-hidden="true">*</abbr></strong>
           <input type="date" name="end_date" class="form-control">
     </div>
 
     
     <div class="form-group">
-        <strong>description</strong>
+        <strong>description <abbr title="(obligatoire)" aria-hidden="true">*</abbr></strong>
           <textarea name="description" class="form-control" cols="30" rows="10" id="summary-ckeditor" name="summary-ckeditor"></textarea>
     </div>
     

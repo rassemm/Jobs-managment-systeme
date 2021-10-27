@@ -113,7 +113,7 @@ class UserController extends Controller
     {
         User::destroy($id);
 
-        return redirect()->with('flash_message', 'User deleted!');
+        return redirect()->route('user.index')->with('flash_message', 'User deleted!');
     }
     public function logout()
     {

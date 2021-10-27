@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use App\Post;
 use App\user;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendMail;
 use DB;
 class PostController extends Controller
 {
@@ -20,7 +23,6 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::with('user')->latest()->paginate(5);
-        notify()->success('Data has been saved successfully!');
         return view('Post.index',compact('posts'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
@@ -44,11 +46,11 @@ class PostController extends Controller
     public function store(Request $request, Post $post)
     {
         $request->validate ([
-            'titre'=>'required',
-           'description'=>'required',
-          'niveau'=>'required',
-          'start_date'=> 'required',
-                 'end_date'=> 'required'
+                'titre'       =>'required|min:2|max:40',
+                'description' =>'required|min:10|max:250',
+                'niveau'      =>'required|min:4|max:20',
+                'start_date' => 'required',
+                'end_date'   => 'required'
             ]);
             $user = auth()->user();
                 $post = new Post();
@@ -60,7 +62,6 @@ class PostController extends Controller
                 $post->user_id = $user->id;
                 $post->save();
                 $post->user_id = $user->id;
-           // Post::create($request->all());
             toastr()->success('Data has been saved successfully!');
 
             return redirect()->route('post.index');
@@ -74,7 +75,6 @@ class PostController extends Controller
      */
     public function show( Post $post)
     {
-        //$post= Post::with('user')->find($id);
 
         return view ('post.show',compact('post'));
     }
@@ -107,13 +107,14 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $request->validate ([
-              'titre'  =>  'required',
-              'description' => 'required',
-             'niveau' => 'required',
-             'start_date'  => 'required',
-             'end_date'=> 'required'
-            ]);
+      
+      $request->validate ([
+        'titre'       =>'required|min:2|max:40',
+        'description' =>'required|min:10|max:250',
+        'niveau'      =>'required|min:4|max:20',
+        'start_date' => 'required',
+        'end_date'   => 'required'
+    ]);
             $user = auth()->user();
                 $post = new Post();
                 $post->titre     = $request->input('titre');
@@ -124,8 +125,9 @@ class PostController extends Controller
                 $post->user_id = $user->id;
                 $post->save();
                 $post->user_id = $user->id;
+                toastr()->warning('Data has been updated successfully!');
 
-            return redirect()->route('post.index');
+            return redirect()->route('post.index')->with('status','Job Update successfully');;
     
     }
 
@@ -141,12 +143,11 @@ class PostController extends Controller
         if($post){
             $post->delete();
         }
+        toastr()->error('Data has been deleted successfully!');
 
-       // notify()->danger('Data has been saved successfully!');
-
-        return redirect()->route('post.index');
+        return redirect()->route('post.index')->with('status','Post deleted successfully');;
     }
-    public function subscribe($id){
+    public function subscribepost($id){
         auth()->user()->posts()->attach($id);
         drakify('success');
         //notify()->success('Data has been subscribe successfully!');
@@ -154,7 +155,7 @@ class PostController extends Controller
       }
       public function remove($id,$uid){
         User::find($uid)->posts()->detach($id);
-        drakify('success');
+        
         return redirect()->route('dachboard.dash');
       }
       public function approve($uid,$id){
@@ -175,5 +176,12 @@ class PostController extends Controller
           return $item;
         });
         return view('post.list', ['posts' => $posts]);
+    }
+    public function sendpost(Request $request,$id)
+    {
+      $request=User::find($id);
+      Mail::to($request->email)->send(new SendMail($request));
+
+     return redirect()->Back()->with('status','mail send Succecvoly');
     }
 }

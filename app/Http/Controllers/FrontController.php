@@ -12,6 +12,8 @@ class FrontController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+
+
     }
     /**
      * Display a listing of the resource.
@@ -42,10 +44,7 @@ class FrontController extends Controller
                 }]
             ])
             ->orderBy("id","desc")
-            ->paginate(2);
-            
-            notify()->success('Data has been saved successfully!');
-            
+            ->paginate(2);            
         $users = User::all();
         return view('dachboard.dach',compact('posts','jobs','users'))->with('i', (request()->input('page', 1) - 1) * 5);
         

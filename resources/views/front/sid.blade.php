@@ -70,7 +70,7 @@
             <li class="nav-item">
               <a href="{{route('myjobs')}}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Mes demandes D'emplois</p>
+                <p>{{ __('Mes demandes Demplois') }}</p>
               </a>
             </li>
             <li class="nav-item">
@@ -82,9 +82,16 @@
             @endif
           </ul>
         </li>
-     
-        
-           
+        @if (auth()->user()->hasRole('user'))
+        <li class="nav-item">
+          <a href="{{route('cv.index')}}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Managment Cvs</p>
+          </a>
+        </li>
+        @endif
+      </ul>
+    </li>
     <!-- /.sidebar-menu -->
   </div>
   <!-- /.sidebar -->

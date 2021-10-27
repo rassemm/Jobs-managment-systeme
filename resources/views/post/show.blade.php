@@ -37,6 +37,9 @@
                 {{ $post->end_date}} </h4>
             </div>
         </div>
+        <div class="pull-right">
+            <a href="{{ url()->previous() }}" class="btn btn-primary"><i class="fas fa-backward"></i></a>
+                    </div>
     </div>
 </div>
 @endsection

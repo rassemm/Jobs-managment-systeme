@@ -83,6 +83,13 @@
                             </div>
                         </div>
                         <div>
+                            <div class="form-group {{ $errors->has('roles') ? 'has-error' : ''}}">
+                                {!! Form::label('roles', 'Roles', ['class' => 'col-md-4 control-label']) !!}
+                                <div class="col-md-6">
+                                    {!! Form::select('roles[]', Spatie\Permission\Models\Role::get()->pluck('name','name'), isset($user)?$user->getRoleNames():null, ('' == 'required') ? ['class' => 'form-control', 'required' => 'required','multiple'] : ['class' => 'form-control','multiple']) !!}
+                                    {!! $errors->first('roles', '<p class="help-block">:message</p>') !!}
+                                </div>
+                            </div>
                             <small class="text-muted d-block mb-3">By clicking on 'Create Jobseeker Account' below you are agreeing to the terms and smallrivacy of Joblister!</p>
                         </div>
                         <button type="submit" class="btn primary-btn btn-block">Register</button>
@@ -178,7 +185,14 @@
                                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                             </div>
                         </div>
-
+                        <div class="form-group {{ $errors->has('roles') ? 'has-error' : ''}}">
+                            {!! Form::label('roles', 'Roles', ['class' => 'col-md-4 control-label']) !!}
+                            <div class="col-md-6">
+                                {!! Form::select('roles[]', Spatie\Permission\Models\Role::get()->pluck('name','name'), isset($user)?$user->getRoleNames():null, ('' == 'required') ? ['class' => 'form-control', 'required' => 'required','multiple'] : ['class' => 'form-control','multiple']) !!}
+                                {!! $errors->first('roles', '<p class="help-block">:message</p>') !!}
+                            </div>
+                        </div>
+                        
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">

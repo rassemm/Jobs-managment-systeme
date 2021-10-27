@@ -27,8 +27,8 @@ class UserTableSeeder extends Seeder
     
          $recruteur = new User();
          $recruteur->name = 'recruteur';
-         $recruteur->email = 'eventmanager@mail.com';
-         $recruteur->password = bcrypt('manager123');
+         $recruteur->email = 'recruteur@mail.com';
+         $recruteur->password = bcrypt('recruteur123');
          $recruteur->save();
         $recruteur->roles()->attach($role_recruteur);
       $recruteur->roles()->attach($role_user);

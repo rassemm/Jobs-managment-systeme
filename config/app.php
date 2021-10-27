@@ -179,7 +179,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\PermissionsServiceProvider::class,
-
+        Nexmo\Laravel\NexmoServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -234,7 +235,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Form' => Collective\Html\FormFacade::class,
     'HTML' => Collective\Html\HtmlFacade::class,
-
+    'Nexmo' => Nexmo\Laravel\Facade\Nexmo::class,
+    'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

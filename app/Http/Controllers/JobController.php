@@ -6,14 +6,16 @@ use App\user;
 use App\Job;
 use App\Categories;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendMail;
+use Nexmo\Laravel\Facades\Nexmo;
 class JobController extends Controller
 {
 
   public function __construct()
   {
       $this->middleware('auth');
-      $this->middleware(['permission:create job|edit job|delete job']);
 
   }
     /**
@@ -25,7 +27,6 @@ class JobController extends Controller
     {
       
         $jobs = job::with('user')->latest()->paginate(5);
-       // toastr()->success('Data has been saved successfully!');
         return view('job.index',compact('jobs'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
@@ -37,8 +38,8 @@ class JobController extends Controller
      */
     public function create()
     {
-      $categories = Categories::all();
-        return view ('job.create',compact('categories'));
+      
+        return view ('job.create');
     }
 
     /**
@@ -51,10 +52,10 @@ class JobController extends Controller
     {
    
             $request->validate ([
-                'titre'=>'required',
-                'description'=>'required',
-                'salaire'=>'required',
-                'end_date'=> 'required'
+                'titre'       =>'required|min:4|max:20',
+                'description' =>'required|min:50',
+                'salaire'     =>'required|min:4|max:10',
+                'end_date'    => 'required'
                 ]);
                 $user = auth()->user();
                 $job = new Job();
@@ -66,8 +67,9 @@ class JobController extends Controller
                 
                 $job->save();
                 $job->user_id = $user->id;
-              
-              notify()->success('Data has been saved successfully!');
+                toastr()->success('Data has been saved successfully!');
+
+              //notify()->success('Data has been saved successfully!');
                 return redirect()->route('job.index');
                             
         
@@ -81,14 +83,6 @@ class JobController extends Controller
      */
     public function show(Job $job)
     {
-      //  $job = Job::with('user')->find($id);
-        // $users = User::whereHas('events', function($q) use($event){
-        //   $q->whereIn('event_id', [$event->id]);
-        // })->get()->map(function ($item, $key) use($id){
-        //   $item->status = DB::select('select * from event_user where event_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;
-        //   return $item;
-        // });
-        
         return view('job.show',compact('job'));
     }
 
@@ -107,6 +101,7 @@ class JobController extends Controller
           $item->status = DB::select('select * from job_user where job_id = :id and user_id= :uid', ['id' => $id,'uid' => $item->id])[0]->status;
           return $item;
         });
+       
         return view('job.edit',compact('job','users'));
 
     }
@@ -120,12 +115,13 @@ class JobController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $request->validate ([
-            'titre'=>'required',
-           'description'=>'required',
-          'salaire'=>'required',
-                 'end_date'=> 'required'
-            ]);
+      
+      $request->validate ([
+        'titre'       =>'required|min:4|max:40',
+        'description' =>'required|min:50',
+        'salaire'     =>'required|min:4|max:10',
+        'end_date'    => 'required'
+        ]);
             $user = auth()->user();
                $job =Job::find($id);
                $job->titre     = $request->input('titre');
@@ -135,7 +131,7 @@ class JobController extends Controller
                $job->user_id = $user->id;
                $job->save();
                 $job->user_id = $user->id;
-                notify()->info('Data has been Update successfully!');
+               toastr()->warning('Data has been updated successfully!');
 
             //$job->update($request->all());
             return redirect()->route('job.index');
@@ -147,20 +143,20 @@ class JobController extends Controller
      * @param  \App\Job  $job
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Job $job)
+    public function destroy($id)
     {
         $job = Job::find($id);
         if($job){
             $job->delete();
         }
-        notify()->danger('Data has been saved successfully!');
 
-        return redirect()->route('job.index');
+        toastr()->error('Data has been deleted successfully!');
+
+        return redirect()->route('job.index')->with('status','Job deleted successfully');
     }
     public function subscribe($id){
         auth()->user()->jobs()->attach($id);
-        drakify('success');
-        notify()->success('Data has been subscribe successfully!');
+        toastr()->success('Data has been updated successfully!');
         return redirect()->back();
       }
       public function remove($id,$uid){
@@ -187,4 +183,21 @@ class JobController extends Controller
         });
         return view('job.list', ['jobs' => $jobs]);
     }
+    public function send($id)
+    {
+      
+      $request=User::find($id);
+     Mail::to( $request->email)->send(new SendMail($request));
+     return redirect()->Back();
+    }
+    public function sendmessage() {
+
+      Nexmo::message()->send([
+        'to'   => '14845551244',
+        'from' => '16105552344',
+        'text' => 'Using the facade to send a message.'
+    ]);
+      echo "Message send avce succes";
+    }
+
 }

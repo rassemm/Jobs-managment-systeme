@@ -15,6 +15,7 @@
                         <thead>
                           <tr>
                             <th>Author</th>
+                            <th>email</th>
                             <th>Title</th>
                             <th>Niveau</th>
                             <th>Date de debut</th>
@@ -27,12 +28,14 @@
                           @foreach($posts as $post)
                             <tr>
                               <td><strong>{{ \App\User::find($post->user_id)->name }}</strong></td>
+                              <td><strong>{{ \App\User::find($post->user_id)->email }}</strong></td>
                               <td><strong>{{ $post->titre }}</strong></td>
                               <td>{{ $post->niveau }}</td>
                               <td><strong>{{ $post->sart_date }}</strong></td>
                               <td><strong>{{ $post->end_date }}</strong></td>
                               <td><strong>{{ $post->status }}</strong></td>
                               <td>
+                                <a class="btn btn-info" href=""><i class="fa fa-list">Envoyer</i></a>
                                 <a class="btn btn-info" href="{{ route('post.show',$post->id)}}"><i class="fa fa-list"></i></a>
                               </td>
                             </tr>

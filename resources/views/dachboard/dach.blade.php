@@ -281,7 +281,9 @@ The above copyright notice and this permission notice shall be included in all c
                             <form method="POST" class="btn" action="{{route('subscribe',$job->id)}}">
                                 @csrf
                                 @method('PUT')
+                                @can('subscribe')
                                 <button class="btn btn-success"  type="submit">Subscribe</button>
+                                @endcan
                             </form>
                           @else
                           <button class="btn btn-danger">Subscribed</button>
@@ -341,7 +343,9 @@ The above copyright notice and this permission notice shall be included in all c
                    <form method="POST" class="btn" action="{{route('subscribepost',$post->id)}}">
                        @csrf
                        @method('PUT')
+                       @can('subscribe')
                        <button class="btn btn-success"  type="submit">Subscribe</button>
+                       @endcan
                    </form>
                  @else
                  <button class="btn btn-danger">Subscribed</button>

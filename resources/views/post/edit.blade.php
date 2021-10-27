@@ -7,7 +7,7 @@
                 <h2  class="alert alert-info">Edit Post</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('post.index') }}"> Back</a>
+                <a class="btn btn-primary" href="{{ route('post.index') }}"> <i class="fas fa-backward"></i></a>
             </div>
         </div>
     </div>
@@ -32,7 +32,7 @@
     
     <div class="form-group">
         <strong>Niveau</strong>
-          <input type="number" name="niveau" value="{{$post->niveau}}" class="form-control">
+          <input type="text" name="niveau" value="{{$post->niveau}}" class="form-control">
     </div>
     <div class="form-group">
         <strong>Date de debut</strong>
@@ -68,6 +68,8 @@
                             <th>Status</th>
                             <th></th>
                             <th></th>
+                            <th>Envoyer Mail</th>
+                            <th>Envoyer SMS</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -82,26 +84,25 @@
                                   <form method="POST" action="{{route('approvepost',[$user->id,$post->id])}}">
                                       @csrf
                                       @method('PUT')
-                                      <button class="btn btn-success"  type="submit">Accepter</button>
+                                      <button class="btn btn-success"  type="submit"><i class="fas fa-check"></i></button>
                                   </form>
                                 @else
                                   <form method="POST" action="{{route('unapprovepost',[$user->id,$post->id])}}">
                                       @csrf
                                       @method('PUT')
-                                      <button class="btn btn-danger"  type="submit">Annuler</button>
+                                      <button class="btn btn-danger"  type="submit"><i class="fas fa-times"></i></button>
                                   </form>
                                 @endif
                                 </td>
                                 <td>
                                 @if($user->status == 'pending')
 
-                                <form method="POST" action="">
-                                    @csrf
-                                    @method('PUT')
-                                    <button class="btn btn-danger"  type="submit">Remove</button>
-                                </form>
+                              
+                                    <button class="btn btn-danger"  type="submit"><i class="fas fa-redo-alt"></i></button>
                                 @endif
                               </td>
+                              <td><a class="btn btn-info" href="{{route('sendpost',$user->id)}}"><i class="fas fa-mail-bulk"></i></a></td>
+                              <td><a class="btn btn-info" href=""><i class="fas fa-sms"></i></a></td>
                             </tr>
                           @endforeach
                         </tbody>

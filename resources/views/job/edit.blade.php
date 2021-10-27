@@ -7,7 +7,7 @@
                 <h2  class="alert alert-info">Edit Job</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('job.index') }}"> Back</a>
+                <a class="btn btn-primary" href="{{ route('job.index') }}"><i class="fas fa-backward"></i></a>
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
 <div class="col-md-12 col-lg-12">
     <div class="card">
                     <div class="card-header">
-                      <i class="fa fa-align-justify"></i>{{ __('Subscribed Users') }}
+                      <i class="fa fa-align-justify"></i>{{ __('Liste des utilisatuers Inscrits') }}
                      
                     <div class="card-body">
                         <table class="table table-responsive-sm table-striped">
@@ -53,6 +53,8 @@
                             <th>Status</th>
                             <th></th>
                             <th></th>
+                            <th>Envoyer Mail</th>
+                            <th>Envoyer SMS</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -67,26 +69,26 @@
                                   <form method="POST" action="{{route('approve',[$user->id,$job->id])}}">
                                       @csrf
                                       @method('PUT')
-                                      <button class="btn btn-success"  type="submit">Accepter</button>
+                                      <button class="btn btn-success"  type="submit"><i class="fas fa-check"></i></button>
                                   </form>
                                 @else
                                   <form method="POST" action="{{route('unapprove',[$user->id,$job->id])}}">
                                       @csrf
                                       @method('PUT')
-                                      <button class="btn btn-danger"  type="submit">Annuler</button>
+                                      <button class="btn btn-danger"  type="submit"><i class="fas fa-times"></i></button>
                                   </form>
                                 @endif
                                 </td>
                                 <td>
                                 @if($user->status == 'pending')
 
-                                <form method="POST" action="/jobs/remove/{{$user->id}}/{{$job->id}}">
-                                    @csrf
-                                    @method('PUT')
-                                    <button class="btn btn-danger"  type="submit">Remove</button>
+                                
+                                    <button class="btn btn-danger"  type="submit"><i class="fas fa-redo-alt"></i></button>
                                 </form>
                                 @endif
                               </td>
+                              <td><a class="btn btn-info" href="{{route('send',$user->id)}}"><i class="fas fa-mail-bulk"></i></a></td>
+                              <td><a class="btn btn-info" href="{{route('sendmessage')}}"><i class="fas fa-sms"></i></a></td>
                             </tr>
                           @endforeach
                         </tbody>

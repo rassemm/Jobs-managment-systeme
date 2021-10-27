@@ -31,6 +31,7 @@
                               <td><strong>{{ $job->description }}</strong></td>
                               <td><strong>{{ $job->status }}</strong></td>
                               <td>
+                                
                                 <a class="btn btn-info" href="{{ route('job.show',$job->id)}}"><i class="fa fa-list"></i></a>
                               </td>
                             </tr>
